@@ -3,9 +3,12 @@
 	"package": "magicjinn.artifactspatch.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
+		"EquipmentAttributeModifierTickerMixin",
 		"FabricRegisterMixin",
 		"LivingEntityFoodUseMixin",
 		"NetworkHandlerMixin",
+		"PlayerAquaDashersPolymerMixin",
+		"PlayerToolTierPolymerMixin",
 		"SwimDataComponentMixin"
 	],
 	"injectors": {

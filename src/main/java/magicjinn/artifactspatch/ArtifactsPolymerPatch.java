@@ -1,7 +1,10 @@
 package magicjinn.artifactspatch;
 
 import artifacts.Artifacts;
+import magicjinn.artifactspatch.poly.PolymerClientChecks;
 import magicjinn.artifactspatch.poly.PolymerFoodUseGuard;
+import magicjinn.artifactspatch.poly.PolymerPlayerAttributeSync;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import magicjinn.artifactspatch.res.ResourcePackSetup;
 import magicjinn.artifactspatch.worn.PlayerWornArtifactsDisplay;
 import eu.pb4.polymer.core.api.utils.PolymerUtils;
@@ -21,6 +24,13 @@ public class ArtifactsPolymerPatch implements ModInitializer {
 		PolymerResourcePackUtils.addModAssets(MOD_ID);
 		ResourcePackSetup.register();
 		PolymerFoodUseGuard.register();
+		ServerPlayConnectionEvents.JOIN.register((handler, _, server) -> {
+			var player = handler.player;
+			if (!PolymerClientChecks.lacksArtifactsClient(player)) {
+				return;
+			}
+			server.execute(() -> PolymerPlayerAttributeSync.sync(player));
+		});
 
 		PolymerUtils.markAsServerOnlyRegistry(Registries.FEATURE);
 		PlayerWornArtifactsDisplay.register();
