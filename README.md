@@ -75,6 +75,11 @@ The build downloads into `libs/` on first compile:
 - `artifacts-fabric-15.1.3.jar` (Modrinth Maven’s `15.1.3` coordinate is not the Fabric jar)
 - `trinkets-polymer-patch-4.0.0-rc.1.0+26.1.jar` ([Trinkets Polymer](https://modrinth.com/mod/trinkets-polymer), not on Maven)
 
+### Debug command (operators)
+
+- `/artifactspatch all` or `/artifacts-polymer all` (permission level **2**, same as vanilla OP commands)
+- Places a **double chest** at your feet (or the nearest spot with room) containing **one of every** `artifacts:*` item from the item registry (including the mimic spawn egg).
+
 ### Local server (`runServer`)
 
 Gradle pulls **[Trinkets Updated](https://modrinth.com/mod/trinkets-updated)** and **Trinkets Polymer** as runtime dependencies so `./gradlew runServer` matches a recommended production server (Artifacts trinkets + vanilla join).

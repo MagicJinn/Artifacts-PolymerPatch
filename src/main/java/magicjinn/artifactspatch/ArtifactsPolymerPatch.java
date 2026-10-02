@@ -1,6 +1,7 @@
 package magicjinn.artifactspatch;
 
 import artifacts.Artifacts;
+import magicjinn.artifactspatch.command.ArtifactsDebugCommand;
 import magicjinn.artifactspatch.poly.AquaDashersPolymerSupport;
 import magicjinn.artifactspatch.poly.PolymerClientChecks;
 import magicjinn.artifactspatch.poly.PolymerFoodUseGuard;
@@ -37,6 +38,7 @@ public class ArtifactsPolymerPatch implements ModInitializer {
 
 		PolymerUtils.markAsServerOnlyRegistry(Registries.FEATURE);
 		PlayerWornArtifactsDisplay.register();
+		ArtifactsDebugCommand.register();
 		LOGGER.info("Artifacts Polymer patch initialized");
 	}
 
