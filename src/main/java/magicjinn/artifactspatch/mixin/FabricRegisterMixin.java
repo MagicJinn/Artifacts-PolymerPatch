@@ -56,7 +56,7 @@ public abstract class FabricRegisterMixin<R> {
 			@SuppressWarnings("unchecked")
 			EntityType<?> entityType = (EntityType<?>) value;
 			if (entityType == ModEntityTypes.MIMIC.get()) {
-				// POLYMER WORKAROUND: Mimic uses a custom polymer entity (MARKER + virtual chest); see MimicPolymerEntity.
+				// POLYMER WORKAROUND: Mimic uses a custom polymer entity (INTERACTION hitbox + virtual chest); see MimicPolymerEntity.
 				PolymerEntityUtils.registerType(entityType);
 				PolymerEntityUtils.registerOverlay((EntityType<MimicEntity>) entityType, MimicPolymerEntity::new);
 			} else {
