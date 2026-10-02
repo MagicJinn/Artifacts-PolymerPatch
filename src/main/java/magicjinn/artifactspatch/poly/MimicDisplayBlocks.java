@@ -16,12 +16,15 @@ public final class MimicDisplayBlocks {
 	}
 
 	public static void register() {
+		// Reserves a slot and registers polymer-blocks with the default pack creator (see polymer-blocks docs).
+		PolymerBlockResourceUtils.requestEmpty(BlockModelType.FULL_BLOCK);
+
 		BlockState bottom = PolymerBlockResourceUtils.requestBlock(
-				BlockModelType.LEAVES,
+				BlockModelType.FULL_BLOCK,
 				PolymerBlockModel.of(ArtifactsPolymerPatch.id("block/mimic_bottom"))
 		);
 		BlockState lid = PolymerBlockResourceUtils.requestBlock(
-				BlockModelType.LEAVES,
+				BlockModelType.FULL_BLOCK,
 				PolymerBlockModel.of(ArtifactsPolymerPatch.id("block/mimic_lid"))
 		);
 		if (bottom != null) {
