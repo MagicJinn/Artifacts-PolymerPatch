@@ -3,6 +3,7 @@ package magicjinn.artifactspatch.poly;
 import artifacts.entity.MimicEntity;
 import com.mojang.math.Transformation;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
+import eu.pb4.polymer.virtualentity.api.elements.InteractionElement;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import net.minecraft.world.entity.Display;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -12,8 +13,8 @@ import org.joml.Vector3f;
 
 // POLYMER WORKAROUND: Hinged mimic lid + bottom ItemDisplays using pack models from artifacts:entity/mimic.
 public final class MimicPolymerChestHolder extends ElementHolder {
-	// Model quads span 12/16 blocks; ItemDisplay FIXED renders smaller than 1:1. ~2.25× ≈ mimic hitbox width (0.875 m).
-	private static final float PART_MODEL_SCALE = 2.25f;
+	// Model quads span 12/16 blocks; ItemDisplay FIXED renders smaller than 1:1. ~1.125× matches chest-sized mimic (~0.875 m wide).
+	private static final float PART_MODEL_SCALE = 1.125f;
 	private static final Vector3f PART_SCALE = new Vector3f(PART_MODEL_SCALE, PART_MODEL_SCALE, PART_MODEL_SCALE);
 	private static final float DISPLAY_SIZE = 0.875f;
 	private static final Vector3f MOUTH_PIVOT = new Vector3f(0.0f, 0.38f, 0.02f);
@@ -28,6 +29,10 @@ public final class MimicPolymerChestHolder extends ElementHolder {
 		this.mimic = mimic;
 		this.bottom = createPart(new ItemStack(MimicDisplayItems.BOTTOM));
 		this.lid = createPart(new ItemStack(MimicDisplayItems.LID));
+		var hitbox = InteractionElement.redirect(mimic);
+		hitbox.setSize(MimicPolymerEntity.MIMIC_HITBOX_SIZE, MimicPolymerEntity.MIMIC_HITBOX_SIZE);
+		hitbox.setResponse(true);
+		addElement(hitbox);
 		addElement(bottom);
 		addElement(lid);
 	}
