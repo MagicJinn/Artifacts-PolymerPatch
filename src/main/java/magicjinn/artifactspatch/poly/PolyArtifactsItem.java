@@ -37,6 +37,16 @@ public record PolyArtifactsItem(Item item) implements VanillaModeledPolymerItem 
 	// custom item models from the Polymer pack (Artifacts models bridged via ResourcePackExtras).
 	@Override
 	public Item getPolymerItem(ItemStack itemStack, PacketContext packetContext) {
+		if (isNonPolymerFood(itemStack)) {
+			// POLYMER WORKAROUND: Use vanilla beef items so eat animation/sounds match; model stays Artifacts via bridge.
+			var path = BuiltInRegistries.ITEM.getKey(item).getPath();
+			if ("everlasting_beef".equals(path)) {
+				return Items.BEEF;
+			}
+			if ("eternal_steak".equals(path)) {
+				return Items.COOKED_BEEF;
+			}
+		}
 		return Items.TRIAL_KEY;
 	}
 
@@ -44,26 +54,6 @@ public record PolyArtifactsItem(Item item) implements VanillaModeledPolymerItem 
 	public Identifier getPolymerItemModel(ItemStack stack, PacketContext context, HolderLookup.Provider lookup) {
 		var path = BuiltInRegistries.ITEM.getKey(item).getPath();
 		return ResourcePackExtras.bridgeModel(Artifacts.id("item/" + path));
-	}
-
-	@Override
-	public boolean shouldStorePolymerItemStackCount() {
-		// POLYMER WORKAROUND: Everlasting food may send an inflated wire count; Polymer must store the real count.
-		return PolyArtifactsItem.isNonPolymerFood(item.getDefaultInstance());
-	}
-
-	@Override
-	public void modifyBasePolymerItemStack(
-			ItemStack original,
-			ItemStack polymer,
-			PacketContext context,
-			HolderLookup.Provider lookup
-	) {
-		// POLYMER WORKAROUND: Keep FOOD/CONSUMABLE on polymer stacks so vanilla clients can eat; wire count
-		// inflation for count-1 stacks is handled in {@link PolymerEverlastingFoodSupport}.
-		if (PolymerEverlastingFoodSupport.appliesTo(context, original)) {
-			PolymerEverlastingFoodSupport.inflatePolymerStackCountForClient(original, polymer);
-		}
 	}
 
 	// POLYMER WORKAROUND: Trinkets Polymer is a server dependency; vanilla clients cannot install Trinkets, so

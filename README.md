@@ -44,7 +44,7 @@ Optional on the **server**: [Accessories](https://modrinth.com/mod/accessories),
 - **Digging claws (Polymer clients)**: server destroy-progress scaling so break time matches server `BLOCK_BREAK_SPEED` from Artifacts (vanilla clients still gate mining on local attributes).
 - **Aqua dashers (Polymer clients)**: packet-only **interaction** deck (boat-sized hitbox) ~1px above water, synced **only to the sprinting player** via virtual entities (no real boat entity).
 - **Resource pack**: rewrites `assets/artifacts/items/*.json` in the generated pack to drop `artifacts:needs_repair` conditions (vanilla clients cannot load that property).
-- **Everlasting beef / eternal steak**: polymer wire stack shows count **+1** when the real stack is a single item (with Polymer counted-stack NBT) so vanilla eat prediction does not ghost-empty the slot; server inventory is never duplicated.
+- **Everlasting beef / eternal steak**: polymer wire type is vanilla beef (eat animation); after eat the server shrinks once and refills the slot like a bottle remainder so client prediction matches.
 - **Tooltips**: server-safe helium flamingo ability text (no `ModKeyMappings` / client key bindings on dedicated server during Polymer tooltip build).
 
 Workarounds in source are tagged `POLYMER WORKAROUND:` (grep the repo). **Chorus totem / equipable totem** death protection is fully server-side in Artifacts and needs no patch workaround.

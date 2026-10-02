@@ -5,6 +5,7 @@
 	"mixins": [
 		"EquipmentAttributeModifierTickerMixin",
 		"FabricRegisterMixin",
+		"LivingEntityEverlastingFoodMixin",
 		"NetworkHandlerMixin",
 		"PlayerAquaDashersPolymerMixin",
 		"PlayerToolTierPolymerMixin",
