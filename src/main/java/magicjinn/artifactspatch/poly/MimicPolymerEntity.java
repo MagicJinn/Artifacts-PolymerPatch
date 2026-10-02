@@ -7,6 +7,7 @@ import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.IdentifiedUniqueEntityAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.BlockDisplayElement;
 import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.block.Blocks;
@@ -49,5 +50,18 @@ public final class MimicPolymerEntity implements PolymerEntity {
 	@Override
 	public boolean sendEmptyTrackerUpdates(ServerPlayer player) {
 		return true;
+	}
+
+	@Override
+	public void modifyRawTrackedData(
+			java.util.List<SynchedEntityData.DataValue<?>> data,
+			ServerPlayer player,
+			boolean initial
+	) {
+		if (!PolymerClientChecks.lacksArtifactsClient(player)) {
+			return;
+		}
+		// Mimic is a living entity server-side; clients see a marker with no custom fields.
+		data.clear();
 	}
 }

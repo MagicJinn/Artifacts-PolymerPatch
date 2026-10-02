@@ -42,7 +42,8 @@ Optional on the **server**: [Accessories](https://modrinth.com/mod/accessories),
 - **Networking**: skips Artifacts **clientbound** custom payloads when the client cannot receive them (avoids disconnects on vanilla clients).
 - **CCA**: limits `SwimDataComponent` sync to clients that can receive Artifacts swim packets.
 - **Digging claws (Polymer clients)**: server destroy-progress scaling so break time matches server `BLOCK_BREAK_SPEED` from Artifacts (vanilla clients still gate mining on local attributes).
-- **Aqua dashers (Polymer clients)**: invisible support **oak boat** aligned so its deck sits ~1px above the water; entity packets go **only to the sprinting player** (other players do not see it). Brief sprint gaps reuse the same boat instead of respawning on every landing.
+- **Aqua dashers (Polymer clients)**: packet-only **interaction** deck (boat-sized hitbox) ~1px above water, synced **only to the sprinting player** via virtual entities (no real boat entity).
+- **Resource pack**: rewrites `assets/artifacts/items/*.json` in the generated pack to drop `artifacts:needs_repair` conditions (vanilla clients cannot load that property).
 
 ## What vanilla clients see (honest status)
 

@@ -9,10 +9,7 @@ import magicjinn.artifactspatch.poly.PolymerPlayerAttributeSync;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import magicjinn.artifactspatch.res.ResourcePackSetup;
 import magicjinn.artifactspatch.worn.PlayerWornArtifactsDisplay;
-import eu.pb4.polymer.core.api.entity.PolymerEntityUtils;
 import eu.pb4.polymer.core.api.utils.PolymerUtils;
-import magicjinn.artifactspatch.poly.AquaDashersSupportBoatPolymer;
-import net.minecraft.world.entity.EntityType;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.core.registries.Registries;
@@ -25,8 +22,6 @@ public class ArtifactsPolymerPatch implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		PolymerEntityUtils.registerOverlay(EntityType.OAK_BOAT, AquaDashersSupportBoatPolymer::tryCreate);
-
 		PolymerResourcePackUtils.addModAssets(Artifacts.MOD_ID);
 		PolymerResourcePackUtils.addModAssets(MOD_ID);
 		ResourcePackSetup.register();

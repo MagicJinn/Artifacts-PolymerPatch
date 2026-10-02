@@ -3,18 +3,16 @@ package magicjinn.artifactspatch.poly;
 import artifacts.component.SwimData;
 import artifacts.platform.PlatformServices;
 import artifacts.registry.ModDataComponents;
-import magicjinn.artifactspatch.ArtifactsPolymerPatch;
+import eu.pb4.polymer.virtualentity.api.ElementHolder;
+import eu.pb4.polymer.virtualentity.api.attachment.ManualAttachment;
+import eu.pb4.polymer.virtualentity.api.elements.InteractionElement;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.vehicle.boat.Boat;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.material.FluidState;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.Iterator;
@@ -23,28 +21,19 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Invisible support boat under Polymer players while aqua-dashers water sprinting.
- * Only the owning player receives entity packets (see {@link AquaDashersSupportBoatPolymer}).
+ * Packet-only support deck for aqua-dashers water sprint (Polymer clients only).
+ * Visible and synced only to the owning player via {@link ElementHolder#startWatching}.
  */
 public final class AquaDashersPolymerSupport {
-	public static final String SUPPORT_BOAT_TAG = ArtifactsPolymerPatch.id("aqua_dashers_support").toString();
-
-	/** Deck top ~1 pixel above the fluid surface. */
 	private static final double DECK_ABOVE_SURFACE = 1.0 / 16.0;
+	private static final float DECK_WIDTH = 1.375F;
+	private static final float DECK_HEIGHT = 0.5625F;
 	private static final int DISCARD_AFTER_TICKS_WITHOUT_SPRINT = 15;
 
-	private static final Map<UUID, Boat> SUPPORT_BOATS = new ConcurrentHashMap<>();
-	private static final Map<Integer, UUID> BOAT_ENTITY_OWNERS = new ConcurrentHashMap<>();
+	private static final Map<UUID, SupportState> SUPPORT = new ConcurrentHashMap<>();
 	private static final Map<UUID, Integer> TICKS_WITHOUT_SPRINT = new ConcurrentHashMap<>();
 
 	private AquaDashersPolymerSupport() {
-	}
-
-	public static UUID getSupportOwner(Boat boat) {
-		if (!boat.entityTags().contains(SUPPORT_BOAT_TAG)) {
-			return null;
-		}
-		return BOAT_ENTITY_OWNERS.get(boat.getId());
 	}
 
 	public static void tick(ServerPlayer player) {
@@ -58,28 +47,14 @@ public final class AquaDashersPolymerSupport {
 			if (idleTicks >= DISCARD_AFTER_TICKS_WITHOUT_SPRINT) {
 				clearSupport(player.getUUID());
 			} else {
-				Boat boat = SUPPORT_BOATS.get(player.getUUID());
-				if (boat != null && !boat.isRemoved()) {
-					syncSupportBoat(player, boat);
-				}
+				syncSupport(player);
 			}
 			return;
 		}
 
 		TICKS_WITHOUT_SPRINT.put(player.getUUID(), 0);
-
-		ServerLevel level = (ServerLevel) player.level();
-		Boat boat = SUPPORT_BOATS.get(player.getUUID());
-		if (boat == null || boat.isRemoved() || boat.level() != level) {
-			if (boat != null) {
-				unregisterBoat(boat);
-			}
-			boat = spawnSupportBoat(level, player);
-			SUPPORT_BOATS.put(player.getUUID(), boat);
-			BOAT_ENTITY_OWNERS.put(boat.getId(), player.getUUID());
-		}
-
-		syncSupportBoat(player, boat);
+		ensureSupport(player);
+		syncSupport(player);
 	}
 
 	public static void onDisconnect(ServerPlayer player) {
@@ -87,12 +62,11 @@ public final class AquaDashersPolymerSupport {
 	}
 
 	public static void clearOrphanedBoats(ServerLevel level) {
-		Iterator<Map.Entry<UUID, Boat>> iterator = SUPPORT_BOATS.entrySet().iterator();
+		Iterator<Map.Entry<UUID, SupportState>> iterator = SUPPORT.entrySet().iterator();
 		while (iterator.hasNext()) {
-			Map.Entry<UUID, Boat> entry = iterator.next();
-			Boat boat = entry.getValue();
-			if (boat.isRemoved() || boat.level() != level) {
-				unregisterBoat(boat);
+			Map.Entry<UUID, SupportState> entry = iterator.next();
+			if (entry.getValue().isStale(level)) {
+				entry.getValue().destroy();
 				iterator.remove();
 				TICKS_WITHOUT_SPRINT.remove(entry.getKey());
 			}
@@ -117,39 +91,33 @@ public final class AquaDashersPolymerSupport {
 		return fluid != null && fluid.is(FluidTags.WATER);
 	}
 
-	private static Boat spawnSupportBoat(ServerLevel level, ServerPlayer owner) {
-		Boat boat = new Boat(EntityType.OAK_BOAT, level, () -> Items.OAK_BOAT);
-		boat.setInvisible(true);
-		boat.setSilent(true);
-		boat.setInvulnerable(true);
-		boat.setNoGravity(true);
-		boat.addTag(SUPPORT_BOAT_TAG);
-		level.addFreshEntity(boat);
-		return boat;
+	private static void ensureSupport(ServerPlayer player) {
+		SUPPORT.computeIfAbsent(player.getUUID(), id -> new SupportState((ServerLevel) player.level(), player));
 	}
 
-	private static void syncSupportBoat(ServerPlayer player, Boat boat) {
-		WaterSurface surface = waterSurfaceAt(player);
-		if (surface == null) {
+	private static void syncSupport(ServerPlayer player) {
+		SupportState state = SUPPORT.get(player.getUUID());
+		if (state == null) {
 			return;
 		}
-
-		Vec3 motion = player.getDeltaMovement();
-		alignBoatDeck(boat, player.getX(), player.getZ(), surface.y);
-		boat.setYRot(player.getYRot());
-		boat.setXRot(0.0F);
-		boat.setDeltaMovement(motion.x, 0, motion.z);
-		boat.setPaddleState(false, false);
+		state.sync(player);
 	}
 
-	private static void alignBoatDeck(Boat boat, double x, double z, double surfaceY) {
-		double targetTop = surfaceY + DECK_ABOVE_SURFACE;
-		boat.setPos(x, surfaceY, z);
-		AABB box = boat.getBoundingBox();
-		double adjust = targetTop - box.maxY;
-		if (Math.abs(adjust) > 1.0E-4) {
-			boat.setPos(x, boat.getY() + adjust, z);
+	private static void clearSupport(UUID playerId) {
+		TICKS_WITHOUT_SPRINT.remove(playerId);
+		SupportState state = SUPPORT.remove(playerId);
+		if (state != null) {
+			state.destroy();
 		}
+	}
+
+	private static Vec3 deckPosition(ServerPlayer player) {
+		WaterSurface surface = waterSurfaceAt(player);
+		if (surface == null) {
+			return player.position();
+		}
+		double y = surface.y + DECK_ABOVE_SURFACE - DECK_HEIGHT;
+		return new Vec3(player.getX(), y, player.getZ());
 	}
 
 	private static WaterSurface waterSurfaceAt(Player player) {
@@ -169,19 +137,6 @@ public final class AquaDashersPolymerSupport {
 		return new WaterSurface(y);
 	}
 
-	private static void clearSupport(UUID playerId) {
-		TICKS_WITHOUT_SPRINT.remove(playerId);
-		Boat boat = SUPPORT_BOATS.remove(playerId);
-		if (boat != null && !boat.isRemoved()) {
-			unregisterBoat(boat);
-			boat.discard();
-		}
-	}
-
-	private static void unregisterBoat(Boat boat) {
-		BOAT_ENTITY_OWNERS.remove(boat.getId());
-	}
-
 	private static FluidState fluidAtFeet(Player player) {
 		BlockPos pos = BlockPos.containing(player.getX(), player.getY() - 0.2, player.getZ());
 		FluidState fluid = player.level().getFluidState(pos);
@@ -190,6 +145,52 @@ public final class AquaDashersPolymerSupport {
 		}
 		pos = player.blockPosition();
 		return player.level().getFluidState(pos);
+	}
+
+	private static final class SupportState {
+		private final ElementHolder holder;
+		private final ManualAttachment attachment;
+		private final ServerLevel level;
+		private final ServerPlayer owner;
+		private final UUID ownerId;
+		private boolean watching;
+
+		private SupportState(ServerLevel level, ServerPlayer owner) {
+			this.level = level;
+			this.owner = owner;
+			this.ownerId = owner.getUUID();
+			this.holder = new ElementHolder();
+			var deck = new InteractionElement();
+			deck.setSize(DECK_WIDTH, DECK_HEIGHT);
+			deck.setResponse(true);
+			deck.setOffset(new Vec3(0, DECK_HEIGHT * 0.5, 0));
+			this.holder.addElement(deck);
+			this.attachment = new ManualAttachment(this.holder, level, () -> deckPosition(this.owner));
+		}
+
+		private void sync(ServerPlayer player) {
+			if (!player.getUUID().equals(ownerId)) {
+				return;
+			}
+			if (!watching) {
+				holder.startWatching(player);
+				watching = true;
+			}
+			holder.tick();
+		}
+
+		private boolean isStale(ServerLevel currentLevel) {
+			return currentLevel != level;
+		}
+
+		private void destroy() {
+			if (watching && owner.isAlive()) {
+				holder.stopWatching(owner);
+				watching = false;
+			}
+			attachment.destroy();
+			holder.destroy();
+		}
 	}
 
 	private record WaterSurface(double y) {
