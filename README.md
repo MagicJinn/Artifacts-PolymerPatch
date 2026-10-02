@@ -45,13 +45,13 @@ Optional: [Accessories](https://modrinth.com/mod/accessories), [Polymer AutoHost
 | Joining the server | **Works** with Polymer pack when networking/registries are patched |
 | Artifact items in inventory / trinkets | **Mostly works**; models/textures from Artifacts pack, vanilla item type on wire (`trial_key` base) |
 | Artifact abilities / combat | **Server-side**; should function; client-only feedback may be missing |
-| Mimic mob | **Partial**; shown as a small placeholder entity (`silverfish`), not the real mimic model/animation |
+| Mimic mob | **Partial**; static **chest** block display on a hidden armor stand (no open/attack animation, no Artifacts mimic model) |
 | Equipped trinket rendering on player | **Limited** without Artifacts client or extra Polymer virtual-entity work |
 | Artifact toggle key / config UI | **Not available** on vanilla clients |
 | Custom sounds at player | Server plays sounds; duplicate client packet is skipped for vanilla |
 | Campsite structures / worldgen | **Server-only** registries; clients do not need Artifacts blocks |
 
-This is an incremental patch: it compiles and covers the main registry and item/entity polymerization path. Further work (mimic model via virtual entities, trinket body rendering, Accessories UI) is expected.
+This is an incremental patch: it compiles and covers the main registry and item/entity polymerization path. Further work (mimic animations/facing, trinket body rendering, Accessories UI) is expected.
 
 ## Building
 

@@ -52,6 +52,7 @@ public abstract class FabricRegisterMixin<R> {
 			@SuppressWarnings("unchecked")
 			EntityType<?> entityType = (EntityType<?>) value;
 			if (entityType == ModEntityTypes.MIMIC.get()) {
+				PolymerEntityUtils.registerType(entityType);
 				PolymerEntityUtils.registerOverlay((EntityType<MimicEntity>) entityType, MimicPolymerEntity::new);
 			} else {
 				PolymerEntityUtils.registerOverlay(entityType, entity -> context -> EntityType.ARMOR_STAND);
