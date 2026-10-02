@@ -16,8 +16,8 @@ public final class MimicPolymerChestHolder extends ElementHolder {
 	// Model geometry spans 12/16 of a block; ~1.125× ≈ mimic width (0.875 m).
 	private static final float PART_MODEL_SCALE = 1.125f;
 	private static final Vector3f PART_SCALE = new Vector3f(PART_MODEL_SCALE, PART_MODEL_SCALE, PART_MODEL_SCALE);
-	// Between ground clip (0) and previous float (0.4375): sit on the interaction box.
-	private static final Vector3f DISPLAY_BASE_LIFT = new Vector3f(0.0f, 0.1875f, 0.0f);
+	// Sit inside the 0.875 m interaction box (was 0.1875: mouth floated above debug hitbox).
+	private static final Vector3f DISPLAY_BASE_LIFT = new Vector3f(0.0f, -0.125f, 0.0f);
 	private static final Vector3f MOUTH_PIVOT = new Vector3f(0.0f, 0.38f, 0.02f);
 	private static final Vector3f BOTTOM_FROM_PIVOT = new Vector3f(0.0f, -0.14f, -0.26f);
 	private static final Vector3f LID_FROM_PIVOT = new Vector3f(0.0f, 0.12f, -0.26f);

@@ -22,7 +22,7 @@ public final class ResourcePackSetup {
 		ResourcePackExtras.forDefault().addBridgedModelsFolder(Artifacts.id("item"), (id, builder) ->
 				new ItemAsset(new BasicItemModel(id), new ItemAsset.Properties(false, false))
 		);
-		// POLYMER WORKAROUND: Mimic ItemDisplay parts use opaque cuboid models from the patch display folder.
+		// POLYMER WORKAROUND: Mimic ItemDisplay parts: mouth cuboids (mimic_opaque) + wood shell (vanilla plank refs).
 		ResourcePackExtras.forDefault().addBridgedModelsFolder(ArtifactsPolymerPatch.id("display"), (id, builder) ->
 				new ItemAsset(new BasicItemModel(id), new ItemAsset.Properties(false, false))
 		);
