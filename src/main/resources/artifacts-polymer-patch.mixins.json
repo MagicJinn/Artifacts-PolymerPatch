@@ -9,7 +9,9 @@
 		"NetworkHandlerMixin",
 		"PlayerAquaDashersPolymerMixin",
 		"PlayerToolTierPolymerMixin",
-		"SwimDataComponentMixin"
+		"ServerPlayerGameModeDigSpeedMixin",
+		"SwimDataComponentMixin",
+		"accessor.ServerPlayerGameModeAccessor"
 	],
 	"injectors": {
 		"defaultRequire": 1

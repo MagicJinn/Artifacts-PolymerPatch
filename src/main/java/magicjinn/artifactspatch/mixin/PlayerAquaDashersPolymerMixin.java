@@ -20,9 +20,6 @@ public class PlayerAquaDashersPolymerMixin {
 		if (!PolymerClientChecks.lacksArtifactsClient(serverPlayer)) {
 			return;
 		}
-		if (!AquaDashersPolymerSupport.isWaterSprinting(player)) {
-			return;
-		}
-		AquaDashersPolymerSupport.stabilizeOnWaterSurface(player);
+		AquaDashersPolymerSupport.tick(serverPlayer);
 	}
 }

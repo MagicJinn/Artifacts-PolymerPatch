@@ -41,6 +41,8 @@ Optional on the **server**: [Accessories](https://modrinth.com/mod/accessories),
 - **Mimic entity**: chest `BlockDisplayElement` on the real mimic (see limitations).
 - **Networking**: skips Artifacts **clientbound** custom payloads when the client cannot receive them (avoids disconnects on vanilla clients).
 - **CCA**: limits `SwimDataComponent` sync to clients that can receive Artifacts swim packets.
+- **Digging claws (Polymer clients)**: server destroy-progress scaling so break time matches server `BLOCK_BREAK_SPEED` from Artifacts (vanilla clients still gate mining on local attributes).
+- **Aqua dashers (Polymer clients)**: invisible support **oak boat** under the player while water sprinting so vanilla clients get a predictable surface (replaces server Y-snapping).
 
 ## What vanilla clients see (honest status)
 

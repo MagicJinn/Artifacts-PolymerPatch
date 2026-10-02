@@ -1,6 +1,7 @@
 package magicjinn.artifactspatch;
 
 import artifacts.Artifacts;
+import magicjinn.artifactspatch.poly.AquaDashersPolymerSupport;
 import magicjinn.artifactspatch.poly.PolymerClientChecks;
 import magicjinn.artifactspatch.poly.PolymerFoodUseGuard;
 import magicjinn.artifactspatch.poly.PolymerPlayerAttributeSync;
@@ -31,6 +32,8 @@ public class ArtifactsPolymerPatch implements ModInitializer {
 			}
 			server.execute(() -> PolymerPlayerAttributeSync.sync(player));
 		});
+		ServerPlayConnectionEvents.DISCONNECT.register((handler, _) ->
+				AquaDashersPolymerSupport.onDisconnect(handler.player));
 
 		PolymerUtils.markAsServerOnlyRegistry(Registries.FEATURE);
 		PlayerWornArtifactsDisplay.register();
