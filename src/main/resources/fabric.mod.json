@@ -27,7 +27,8 @@
 		"java": ">=25",
 		"fabric-api": "*",
 		"artifacts": ">=15.1.3",
-		"polymer": "*"
+		"polymer-core": "*",
+		"polymer-resource-pack": "*"
 	},
 	"suggests": {
 		"trinkets_updated": "*",
