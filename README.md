@@ -21,7 +21,9 @@ Inspired by [PolymerPorts](https://github.com/PolymerPorts) patches such as [cc-
 | [Fabric API](https://modrinth.com/mod/fabric-api) | Required |
 | [Trinkets Updated](https://modrinth.com/mod/trinkets-updated) | Strongly recommended; Artifacts equips many items as trinkets on Fabric |
 
-Optional: [Trinkets Polymer](https://modrinth.com/mod/trinkets-polymer) (trinket slot UI/sync), [Accessories](https://modrinth.com/mod/accessories), [Polymer AutoHost](https://modrinth.com/mod/polymer) for automatic resource pack hosting.
+Optional on the **server**: [Trinkets Polymer](https://modrinth.com/mod/trinkets-polymer) (Polymer-friendly trinket equip UI for non-Trinkets clients; **not** required on vanilla clients), [Accessories](https://modrinth.com/mod/accessories), [Polymer AutoHost](https://modrinth.com/mod/polymer) for automatic resource pack hosting.
+
+**Vanilla clients** need no mods (no Fabric API, no Trinkets). Accept the Polymer resource pack when prompted.
 
 ## Install
 
@@ -45,7 +47,7 @@ Optional: [Trinkets Polymer](https://modrinth.com/mod/trinkets-polymer) (trinket
 |------|--------|
 | Joining the server | **Works** with Polymer pack when networking/registries are patched |
 | Artifact items in inventory / hotbar | **Works** for item-model-based Artifacts (Polymer pack + `trial_key` wire type) |
-| Trinket slot UI (equip screen) | Use **[Trinkets Polymer](https://modrinth.com/mod/trinkets-polymer)**; not implemented in this mod |
+| Trinket slot UI (equip screen) | Optional **server** mod **[Trinkets Polymer](https://modrinth.com/mod/trinkets-polymer)**; vanilla clients still install nothing |
 | Worn Artifacts on player body | **Partial** with Trinkets Updated: floating **item displays** at slot offsets (not hat/glove 3D meshes from Artifacts client) |
 | Artifact abilities / combat | **Server-side**; should function; client-only feedback may be missing |
 | Mimic mob | **Partial**; static **chest** block display (no open/attack animation, no Artifacts mimic model) |
@@ -55,7 +57,9 @@ Optional: [Trinkets Polymer](https://modrinth.com/mod/trinkets-polymer) (trinket
 
 Further work: Artifacts-style body meshes (per-item renderers), slot-accurate posing, Accessories path, mimic animations.
 
-**Without Trinkets Updated on the server**, worn displays are skipped (Artifacts trinket slots are unavailable anyway). **Without Trinkets Polymer on the client**, slot menus may still be awkward, but item models and worn displays can still appear once the Polymer pack is accepted.
+**Without Trinkets Updated on the server**, worn displays are skipped (Artifacts trinket slots are unavailable anyway). This patch marks Trinkets `trinkets:*` data components as **server-only** in Fabric Registry Sync so vanilla clients are not kicked when Trinkets Updated is on the server.
+
+**Without Trinkets Polymer on the server**, vanilla clients cannot open a full trinket equip menu (commands/creative may still apply items); worn body displays still work when items are equipped server-side.
 
 ## Building
 

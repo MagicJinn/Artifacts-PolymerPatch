@@ -1,10 +1,12 @@
 package magicjinn.artifactspatch.mixin;
 
+import artifacts.Artifacts;
 import artifacts.entity.MimicEntity;
 import artifacts.fabric.registry.FabricRegister;
 import artifacts.registry.ModEntityTypes;
 import artifacts.registry.Register;
 import artifacts.registry.RegistryHolder;
+import eu.pb4.polymer.rsm.api.RegistrySyncUtils;
 import magicjinn.artifactspatch.poly.MimicPolymerEntity;
 import magicjinn.artifactspatch.poly.PolyArtifactsItem;
 import eu.pb4.polymer.core.api.entity.PolymerEntityUtils;
@@ -16,6 +18,7 @@ import eu.pb4.polymer.core.api.other.PolymerMobEffect;
 import eu.pb4.polymer.core.api.other.PolymerSoundEvent;
 import eu.pb4.polymer.core.api.utils.PolymerSyncedObject;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.effect.MobEffect;
@@ -85,5 +88,16 @@ public abstract class FabricRegisterMixin<R> {
 		} else if (registryKey.equals(Registries.CONSUME_EFFECT_TYPE)) {
 			PolymerConsumeEffect.registerConsumeEffect((ConsumeEffect.Type<?>) value);
 		}
+
+		holder.unwrapKey().ifPresent(key -> {
+			if (!Artifacts.MOD_ID.equals(key.identifier().getNamespace())) {
+				return;
+			}
+			@SuppressWarnings("unchecked")
+			Registry<R> registry = (Registry<R>) BuiltInRegistries.REGISTRY.getValue(registryKey.identifier());
+			if (registry != null) {
+				RegistrySyncUtils.setServerEntry(registry, value);
+			}
+		});
 	}
 }
