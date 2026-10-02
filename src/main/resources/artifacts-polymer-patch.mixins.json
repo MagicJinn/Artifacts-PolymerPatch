@@ -7,6 +7,7 @@
 		"FabricRegisterMixin",
 		"LivingEntityEverlastingFoodMixin",
 		"NetworkHandlerMixin",
+		"PlayerAquaDashersPolymerMixin",
 		"PlayerToolTierPolymerMixin",
 		"ServerPlayerGameModeDigSpeedMixin",
 		"SwimDataComponentMixin",

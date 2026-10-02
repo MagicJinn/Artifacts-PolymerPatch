@@ -4,6 +4,7 @@ import artifacts.Artifacts;
 import magicjinn.artifactspatch.command.ArtifactsDebugCommand;
 import magicjinn.artifactspatch.poly.PolymerClientChecks;
 import magicjinn.artifactspatch.poly.PolymerPlayerAttributeSync;
+import magicjinn.artifactspatch.poly.AquaDashersClientBarrierSupport;
 import magicjinn.artifactspatch.poly.TogglePolymerSupport;
 import magicjinn.artifactspatch.res.ResourcePackSetup;
 import eu.pb4.polymer.core.api.utils.PolymerUtils;
@@ -37,6 +38,8 @@ public class ArtifactsPolymerPatch implements ModInitializer {
 		// POLYMER WORKAROUND: Artifacts campsite features are server worldgen only; hide from client registry sync.
 		PolymerUtils.markAsServerOnlyRegistry(Registries.FEATURE);
 		TogglePolymerSupport.register();
+		ServerPlayConnectionEvents.DISCONNECT.register((handler, _) ->
+				AquaDashersClientBarrierSupport.onDisconnect(handler.player));
 		ArtifactsDebugCommand.register();
 		LOGGER.info("Artifacts Polymer patch initialized");
 	}
