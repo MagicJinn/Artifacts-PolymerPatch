@@ -36,13 +36,11 @@ Optional on the **server**: [Accessories](https://modrinth.com/mod/accessories),
 ## What this patch does
 
 - **Mixin** on Artifacts’ `FabricRegister` to register Polymer overlays when Artifacts registers content (items, entities, sounds, data components, attributes, etc.).
-- **Items (held / inventory)**: `VanillaModeledPolymerItem` overlays with Artifacts `assets/artifacts/items` models bridged into the Polymer pack, including server-side `artifacts:needs_repair` item model property.
-- **Worn trinkets (player body)**: when **Trinkets Updated** is present, `ItemDisplayElement`s attached to players show equipped Artifacts using those same item models (approximate slot offsets; not Artifacts’ custom 3D armor models).
+- **Items (held / inventory)**: `PolyArtifactsItem` overlays with Artifacts `assets/artifacts/items` models bridged into the Polymer pack, including server-side `artifacts:needs_repair` item model property.
 - **Mimic entity**: chest `BlockDisplayElement` on the real mimic (see limitations).
 - **Networking**: skips Artifacts **clientbound** custom payloads when the client cannot receive them (avoids disconnects on vanilla clients).
 - **CCA**: limits `SwimDataComponent` sync to clients that can receive Artifacts swim packets.
 - **Digging claws (Polymer clients)**: server destroy-progress scaling so break time matches server `BLOCK_BREAK_SPEED` from Artifacts (vanilla clients still gate mining on local attributes).
-- **Aqua dashers (Polymer clients)**: packet-only **interaction** deck (boat-sized hitbox) ~1px above water, synced **only to the sprinting player** via virtual entities (no real boat entity).
 - **Resource pack**: rewrites `assets/artifacts/items/*.json` in the generated pack to drop `artifacts:needs_repair` conditions (vanilla clients cannot load that property).
 - **Everlasting beef / eternal steak**: polymer wire type is vanilla beef (eat animation); after eat the server shrinks once and refills the slot like a bottle remainder so client prediction matches.
 - **Tooltips**: server-safe helium flamingo ability text (no `ModKeyMappings` / client key bindings on dedicated server during Polymer tooltip build).
@@ -55,17 +53,16 @@ Workarounds in source are tagged `POLYMER WORKAROUND:` (grep the repo). **Chorus
 |------|--------|
 | Joining the server | **Works** with Polymer pack when networking/registries are patched |
 | Artifact items in inventory / hotbar | **Works** for item-model-based Artifacts (Polymer pack + `trial_key` wire type) |
-| Trinket slot UI (equip screen) | Optional **server** mod **[Trinkets Polymer](https://modrinth.com/mod/trinkets-polymer)**; vanilla clients still install nothing |
-| Worn Artifacts on player body | **Partial** with Trinkets Updated: floating **item displays** at slot offsets (not hat/glove 3D meshes from Artifacts client) |
+| Trinket slot UI (equip screen) | **[Trinkets Polymer](https://modrinth.com/mod/trinkets-polymer)** on the server; vanilla clients install nothing |
+| Worn Artifacts on player body | **Not shown** (Artifacts client 3D meshes only; Polymer virtual item displays were removed as unstable) |
 | Artifact abilities / combat | **Server-side**; should function; client-only feedback may be missing |
+| Aqua dashers water sprint | **Server-side** fluid collision only; Polymer clients do not get Artifacts’ client walk-on-water presentation |
 | Mimic mob | **Partial**; static **chest** block display (no open/attack animation, no Artifacts mimic model) |
 | Artifact toggle key / config UI | **Not available** on vanilla clients |
 | Custom sounds at player | Server plays sounds; duplicate client packet is skipped for vanilla |
 | Campsite structures / worldgen | **Server-only** registries; clients do not need Artifacts blocks |
 
-Further work: Artifacts-style body meshes (per-item renderers), slot-accurate posing, Accessories path, mimic animations.
-
-**Without Trinkets Updated on the server**, worn displays are skipped (Artifacts trinket slots are unavailable anyway).
+Further work: stable worn-trinket visuals, aqua dashers client presentation, mimic animations, Accessories path.
 
 **Without [Trinkets Polymer](https://modrinth.com/mod/trinkets-polymer) on the server** (while Trinkets Updated is present), vanilla clients typically disconnect on join (extra inventory slots / registry sync). Trinkets Polymer is a separate **server** mod; do not install it on vanilla clients.
 
