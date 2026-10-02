@@ -5,7 +5,6 @@ import eu.pb4.polymer.core.api.item.VanillaModeledPolymerItem;
 import eu.pb4.polymer.resourcepack.extras.api.ResourcePackExtras;
 import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
@@ -52,12 +51,8 @@ public record PolyArtifactsItem(Item item) implements VanillaModeledPolymerItem 
 			PacketContext context,
 			HolderLookup.Provider lookup
 	) {
-		var path = BuiltInRegistries.ITEM.getKey(item).getPath();
-		if (NON_POLYMER_FOOD_ITEMS.contains(path)) {
-			polymer.remove(DataComponents.FOOD);
-			polymer.remove(DataComponents.CONSUMABLE);
-			polymer.remove(DataComponents.USE_COOLDOWN);
-		}
+		// Keep FOOD/CONSUMABLE on polymer stacks so vanilla clients can start eating;
+		// {@link PolymerFoodUseGuard} prevents desync via a brief stack size of 2.
 	}
 
 	@Override
