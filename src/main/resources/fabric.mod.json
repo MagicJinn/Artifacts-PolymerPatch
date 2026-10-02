@@ -1,0 +1,36 @@
+{
+	"schemaVersion": 1,
+	"id": "artifacts-polymer-patch",
+	"version": "${version}",
+	"name": "Polymer Patch for Artifacts",
+	"description": "Server-side Polymer compatibility patch for Artifacts. Lets vanilla clients join servers that run Artifacts.",
+	"authors": [
+		"MagicJinn"
+	],
+	"contact": {
+		"homepage": "https://github.com/MagicJinn/Artifacts-PolymerPatch",
+		"sources": "https://github.com/MagicJinn/Artifacts-PolymerPatch"
+	},
+	"license": "MIT",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"dev.magicjinn.artifactspatch.ArtifactsPolymerPatch"
+		]
+	},
+	"mixins": [
+		"artifacts-polymer-patch.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.19.2",
+		"minecraft": "~26.1",
+		"java": ">=25",
+		"fabric-api": "*",
+		"artifacts": ">=15.1.3",
+		"polymer": "*"
+	},
+	"suggests": {
+		"trinkets_updated": "*",
+		"accessories": "*"
+	}
+}
