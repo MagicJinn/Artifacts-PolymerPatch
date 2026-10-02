@@ -13,7 +13,8 @@ import net.minecraft.world.item.Items;
 public record MimicDisplayPolymerItem(Item item, Identifier modelId) implements VanillaModeledPolymerItem {
 	@Override
 	public Item getPolymerItem(ItemStack itemStack, PacketContext packetContext) {
-		return Items.TRIAL_KEY;
+		// POLYMER WORKAROUND: Trial key generated item layer drew on top of custom cuboids; keep items invisible if used.
+		return Items.BARRIER;
 	}
 
 	@Override

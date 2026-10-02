@@ -1,0 +1,117 @@
+{
+  "texture_size": [
+    64,
+    32
+  ],
+  "textures": {
+    "particle": "artifacts-polymer-patch:item/mimic",
+    "mimic": "artifacts-polymer-patch:item/mimic"
+  },
+  "gui_light": "front",
+  "elements": [
+    {
+      "from": [
+        2,
+        13,
+        1
+      ],
+      "to": [
+        14,
+        16,
+        13
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            3.0,
+            0.0,
+            6.0,
+            6.0
+          ],
+          "texture": "#mimic"
+        },
+        "up": {
+          "uv": [
+            6.0,
+            6.0,
+            9.0,
+            0.0
+          ],
+          "texture": "#mimic"
+        },
+        "west": {
+          "uv": [
+            0.0,
+            6.0,
+            3.0,
+            7.5
+          ],
+          "texture": "#mimic"
+        },
+        "north": {
+          "uv": [
+            3.0,
+            6.0,
+            6.0,
+            7.5
+          ],
+          "texture": "#mimic"
+        },
+        "east": {
+          "uv": [
+            6.0,
+            6.0,
+            9.0,
+            7.5
+          ],
+          "texture": "#mimic"
+        },
+        "south": {
+          "uv": [
+            9.0,
+            6.0,
+            12.0,
+            7.5
+          ],
+          "texture": "#mimic"
+        }
+      },
+      "shade": false,
+      "light_emission": 15
+    },
+    {
+      "from": [
+        2,
+        13,
+        1
+      ],
+      "to": [
+        14,
+        13.02,
+        13
+      ],
+      "faces": {
+        "up": {
+          "uv": [
+            6.0,
+            0.0,
+            9.0,
+            6.0
+          ],
+          "texture": "#mimic"
+        },
+        "down": {
+          "uv": [
+            6.0,
+            0.0,
+            9.0,
+            6.0
+          ],
+          "texture": "#mimic"
+        }
+      },
+      "shade": false,
+      "light_emission": 15
+    }
+  ]
+}

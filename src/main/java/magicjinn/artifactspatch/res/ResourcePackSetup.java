@@ -26,6 +26,7 @@ public final class ResourcePackSetup {
 		ResourcePackExtras.forDefault().addBridgedModelsFolder(ArtifactsPolymerPatch.id("display"), (id, builder) ->
 				new ItemAsset(new BasicItemModel(id), new ItemAsset.Properties(false, false))
 		);
+		// POLYMER WORKAROUND: BlockDisplay mimic parts override dead coral block models in assets/minecraft/blockstates/.
 
 		PolymerResourcePackUtils.RESOURCE_PACK_CREATION_EVENT.register(builder ->
 				builder.addResourceConverter(ResourcePackSetup::stripNeedsRepairItemModels)
