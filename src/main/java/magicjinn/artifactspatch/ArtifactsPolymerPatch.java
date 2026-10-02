@@ -5,6 +5,7 @@ import magicjinn.artifactspatch.command.ArtifactsDebugCommand;
 import magicjinn.artifactspatch.poly.PolymerClientChecks;
 import magicjinn.artifactspatch.poly.PolymerPlayerAttributeSync;
 import magicjinn.artifactspatch.poly.AquaDashersClientBarrierSupport;
+import magicjinn.artifactspatch.poly.MimicDisplayBlocks;
 import magicjinn.artifactspatch.poly.MimicDisplayItems;
 import magicjinn.artifactspatch.poly.TogglePolymerSupport;
 import magicjinn.artifactspatch.res.ResourcePackSetup;
@@ -25,6 +26,7 @@ public class ArtifactsPolymerPatch implements ModInitializer {
 		PolymerResourcePackUtils.addModAssets(Artifacts.MOD_ID);
 		PolymerResourcePackUtils.addModAssets(MOD_ID);
 		ResourcePackSetup.register();
+		MimicDisplayBlocks.register();
 		MimicDisplayItems.register();
 
 		// POLYMER WORKAROUND: Equipment modifiers from Artifacts are server-side; push attribute packets on join

@@ -9,7 +9,7 @@ import net.minecraft.world.entity.Display;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
-// POLYMER WORKAROUND: Hinged mimic lid + bottom BlockDisplays (block renderer); ItemDisplay cuboid body quads were not drawn.
+// POLYMER WORKAROUND: Hinged mimic lid + bottom BlockDisplays using polymer-blocks virtual states (see MimicDisplayBlocks).
 public final class MimicPolymerChestHolder extends ElementHolder {
 	// Model geometry spans 12/16 of a block; ~1.125× ≈ mimic width (0.875 m).
 	private static final float PART_MODEL_SCALE = 1.125f;
@@ -26,8 +26,8 @@ public final class MimicPolymerChestHolder extends ElementHolder {
 
 	public MimicPolymerChestHolder(MimicEntity mimic) {
 		this.mimic = mimic;
-		this.bottom = createPart(MimicDisplayBlocks.BOTTOM_VISUAL);
-		this.lid = createPart(MimicDisplayBlocks.LID_VISUAL);
+		this.bottom = createPart(MimicDisplayBlocks.bottomVisual());
+		this.lid = createPart(MimicDisplayBlocks.lidVisual());
 		var hitbox = InteractionElement.redirect(mimic);
 		hitbox.setSize(MimicPolymerEntity.MIMIC_HITBOX_SIZE, MimicPolymerEntity.MIMIC_HITBOX_SIZE);
 		hitbox.setResponse(true);
