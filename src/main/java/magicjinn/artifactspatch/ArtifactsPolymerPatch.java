@@ -32,10 +32,7 @@ public class ArtifactsPolymerPatch implements ModInitializer {
 			if (!PolymerClientChecks.lacksArtifactsClient(player)) {
 				return;
 			}
-			server.execute(() -> {
-				TogglePolymerSupport.enableEquippedToggles(player);
-				PolymerPlayerAttributeSync.sync(player);
-			});
+			server.execute(() -> PolymerPlayerAttributeSync.sync(player));
 		});
 
 		// POLYMER WORKAROUND: Artifacts campsite features are server worldgen only; hide from client registry sync.

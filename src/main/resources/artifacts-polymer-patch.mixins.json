@@ -5,8 +5,6 @@
 	"mixins": [
 		"EquipmentAttributeModifierTickerMixin",
 		"FabricRegisterMixin",
-		"ItemEntityMagnetPickupPolymerMixin",
-		"MagnetismMobEffectPolymerMixin",
 		"LivingEntityEverlastingFoodMixin",
 		"NetworkHandlerMixin",
 		"PlayerAquaDashersPolymerMixin",
