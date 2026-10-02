@@ -1,12 +1,12 @@
-package dev.magicjinn.artifactspatch.mixin;
+package magicjinn.artifactspatch.mixin;
 
 import artifacts.entity.MimicEntity;
 import artifacts.fabric.registry.FabricRegister;
 import artifacts.registry.ModEntityTypes;
 import artifacts.registry.Register;
 import artifacts.registry.RegistryHolder;
-import dev.magicjinn.artifactspatch.poly.MimicPolymerEntity;
-import dev.magicjinn.artifactspatch.poly.PolyArtifactsItem;
+import magicjinn.artifactspatch.poly.MimicPolymerEntity;
+import magicjinn.artifactspatch.poly.PolyArtifactsItem;
 import eu.pb4.polymer.core.api.entity.PolymerEntityUtils;
 import eu.pb4.polymer.core.api.item.PolymerCreativeModeTabUtils;
 import eu.pb4.polymer.core.api.item.PolymerItem;

@@ -1,4 +1,4 @@
-package dev.magicjinn.artifactspatch.res;
+package magicjinn.artifactspatch.res;
 
 import artifacts.Artifacts;
 import eu.pb4.polymer.resourcepack.extras.api.ResourcePackExtras;

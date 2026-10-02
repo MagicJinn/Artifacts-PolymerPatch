@@ -1,4 +1,4 @@
-package dev.magicjinn.artifactspatch.mixin;
+package magicjinn.artifactspatch.mixin;
 
 import artifacts.fabric.component.SwimDataComponent;
 import artifacts.network.payload.UpdateSwimFlyingPacket;

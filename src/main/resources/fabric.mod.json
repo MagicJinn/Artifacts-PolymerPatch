@@ -15,7 +15,7 @@
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"dev.magicjinn.artifactspatch.ArtifactsPolymerPatch"
+			"magicjinn.artifactspatch.ArtifactsPolymerPatch"
 		]
 	},
 	"mixins": [

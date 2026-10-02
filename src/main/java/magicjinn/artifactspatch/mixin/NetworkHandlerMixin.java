@@ -1,4 +1,4 @@
-package dev.magicjinn.artifactspatch.mixin;
+package magicjinn.artifactspatch.mixin;
 
 import artifacts.network.NetworkHandler;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;

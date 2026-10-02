@@ -1,4 +1,4 @@
-package dev.magicjinn.artifactspatch.worn;
+package magicjinn.artifactspatch.worn;
 
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.phys.Vec3;

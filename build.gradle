@@ -46,7 +46,9 @@ dependencies {
 	implementation "eu.pb4:polymer-virtual-entity:${project.polymer_version}"
 
 	compileOnly "org.ladysnake.cardinal-components-api:cardinal-components-base:8.0.0"
-	compileOnly "eu.pb4:trinkets:4.0.1+26.1"
+
+	// Dev / runServer: Artifacts trinket slots and equipping require Trinkets Updated on the server.
+	implementation "eu.pb4:trinkets:4.0.1+26.1"
 }
 
 processResources {

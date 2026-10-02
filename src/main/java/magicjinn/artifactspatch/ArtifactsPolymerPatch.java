@@ -1,8 +1,8 @@
-package dev.magicjinn.artifactspatch;
+package magicjinn.artifactspatch;
 
 import artifacts.Artifacts;
-import dev.magicjinn.artifactspatch.res.ResourcePackSetup;
-import dev.magicjinn.artifactspatch.worn.PlayerWornArtifactsDisplay;
+import magicjinn.artifactspatch.res.ResourcePackSetup;
+import magicjinn.artifactspatch.worn.PlayerWornArtifactsDisplay;
 import eu.pb4.polymer.core.api.utils.PolymerUtils;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.fabricmc.api.ModInitializer;
