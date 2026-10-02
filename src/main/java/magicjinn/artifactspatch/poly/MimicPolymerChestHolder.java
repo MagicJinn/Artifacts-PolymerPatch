@@ -3,35 +3,36 @@ package magicjinn.artifactspatch.poly;
 import artifacts.entity.MimicEntity;
 import com.mojang.math.Transformation;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
-import eu.pb4.polymer.virtualentity.api.elements.BlockDisplayElement;
+import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import net.minecraft.world.entity.Display;
-import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
-// POLYMER WORKAROUND: Two-part hinged chest (lid + bottom) for Polymer clients; Artifacts uses MimicModel on the real client.
+// POLYMER WORKAROUND: Hinged mimic lid + bottom ItemDisplays using pack models from artifacts:entity/mimic.
 public final class MimicPolymerChestHolder extends ElementHolder {
 	private static final float MIMIC_SCALE = 14f / 16f;
-	private static final Vector3f PART_SCALE = new Vector3f(MIMIC_SCALE, MIMIC_SCALE * 0.5f, MIMIC_SCALE);
-	// Shared mouth pivot (Artifacts MimicModel: lid and bottom share PartPose offset 0, 15, 7).
+	private static final Vector3f PART_SCALE = new Vector3f(MIMIC_SCALE, MIMIC_SCALE, MIMIC_SCALE);
 	private static final Vector3f MOUTH_PIVOT = new Vector3f(0.0f, 0.38f, 0.02f);
 	private static final Vector3f BOTTOM_FROM_PIVOT = new Vector3f(0.0f, -0.14f, -0.26f);
 	private static final Vector3f LID_FROM_PIVOT = new Vector3f(0.0f, 0.12f, -0.26f);
 
 	private final MimicEntity mimic;
-	private final BlockDisplayElement bottom;
-	private final BlockDisplayElement lid;
+	private final ItemDisplayElement bottom;
+	private final ItemDisplayElement lid;
 
 	public MimicPolymerChestHolder(MimicEntity mimic) {
 		this.mimic = mimic;
-		this.bottom = createPart();
-		this.lid = createPart();
+		this.bottom = createPart(new ItemStack(MimicDisplayItems.BOTTOM));
+		this.lid = createPart(new ItemStack(MimicDisplayItems.LID));
 		addElement(bottom);
 		addElement(lid);
 	}
 
-	private static BlockDisplayElement createPart() {
-		var element = new BlockDisplayElement(Blocks.CHEST.defaultBlockState());
+	private static ItemDisplayElement createPart(ItemStack stack) {
+		var element = new ItemDisplayElement(stack);
+		element.setItemDisplayContext(ItemDisplayContext.FIXED);
 		element.setBillboardMode(Display.BillboardConstraints.FIXED);
 		element.setInterpolationDuration(1);
 		element.setTeleportDuration(1);

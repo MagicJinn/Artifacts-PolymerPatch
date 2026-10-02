@@ -1,0 +1,28 @@
+{
+  "texture_size": [64, 32],
+  "textures": {
+    "mimic": "artifacts:entity/mimic"
+  },
+  "elements": [
+    {
+      "from": [2, 13, 1],
+      "to": [14, 16, 13],
+      "faces": {
+        "north": { "uv": [14, 3, 2, 0], "texture": "#mimic" },
+        "south": { "uv": [26, 3, 14, 0], "texture": "#mimic" },
+        "east": { "uv": [2, 3, 14, 0], "texture": "#mimic" },
+        "west": { "uv": [14, 3, 26, 0], "texture": "#mimic" },
+        "up": { "uv": [14, 0, 2, 12], "texture": "#mimic" },
+        "down": { "uv": [26, 0, 14, 12], "texture": "#mimic" }
+      }
+    },
+    {
+      "from": [2, 13, 1],
+      "to": [14, 13.01, 13],
+      "faces": {
+        "up": { "uv": [36, 0, 24, 12], "texture": "#mimic" },
+        "down": { "uv": [36, 0, 24, 12], "texture": "#mimic" }
+      }
+    }
+  ]
+}
