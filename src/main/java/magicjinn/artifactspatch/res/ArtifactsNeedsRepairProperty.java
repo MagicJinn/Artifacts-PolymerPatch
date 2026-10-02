@@ -1,4 +1,4 @@
-package dev.magicjinn.artifactspatch.res;
+package magicjinn.artifactspatch.res;
 
 import artifacts.util.ItemDamageUtil;
 import com.mojang.serialization.MapCodec;

@@ -1,7 +1,7 @@
-package dev.magicjinn.artifactspatch.poly;
+package magicjinn.artifactspatch.poly;
 
 import artifacts.entity.MimicEntity;
-import dev.magicjinn.artifactspatch.ArtifactsPolymerPatch;
+import magicjinn.artifactspatch.ArtifactsPolymerPatch;
 import eu.pb4.polymer.core.api.entity.PolymerEntity;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.IdentifiedUniqueEntityAttachment;

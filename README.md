@@ -65,6 +65,10 @@ Further work: Artifacts-style body meshes (per-item renderers), slot-accurate po
 
 The build downloads `artifacts-fabric-15.1.3.jar` into `libs/` on first compile (Modrinth Maven’s `15.1.3` coordinate is not the Fabric jar).
 
+### Local server (`runServer`)
+
+Gradle pulls **[Trinkets Updated](https://modrinth.com/mod/trinkets-updated)** (`eu.pb4:trinkets:4.0.1+26.1` from [Nucleoid Maven](https://maven.nucleoid.xyz/)) as a runtime dependency so `./gradlew runServer` can equip Artifacts like a real server. Optional: add [Trinkets Polymer](https://modrinth.com/mod/trinkets-polymer) to the run `mods` folder for vanilla-client trinket slot UI (not bundled here).
+
 ## License
 
 MIT (same as this repository). Artifacts and Polymer are separate projects with their own licenses.

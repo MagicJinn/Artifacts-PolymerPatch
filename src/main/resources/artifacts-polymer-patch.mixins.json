@@ -1,6 +1,6 @@
 {
 	"required": true,
-	"package": "dev.magicjinn.artifactspatch.mixin",
+	"package": "magicjinn.artifactspatch.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
 		"FabricRegisterMixin",

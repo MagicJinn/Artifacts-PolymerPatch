@@ -1,7 +1,7 @@
-package dev.magicjinn.artifactspatch.worn;
+package magicjinn.artifactspatch.worn;
 
 import artifacts.Artifacts;
-import dev.magicjinn.artifactspatch.ArtifactsPolymerPatch;
+import magicjinn.artifactspatch.ArtifactsPolymerPatch;
 import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.attachment.IdentifiedUniqueEntityAttachment;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
