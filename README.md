@@ -44,6 +44,7 @@ Optional on the **server**: [Accessories](https://modrinth.com/mod/accessories),
 - **Resource pack**: rewrites `assets/artifacts/items/*.json` in the generated pack to drop `artifacts:needs_repair` conditions (vanilla clients cannot load that property).
 - **Everlasting beef / eternal steak**: polymer wire type is vanilla beef (eat animation); after eat the server shrinks once and refills the slot like a bottle remainder so client prediction matches.
 - **Tooltips**: server-safe helium flamingo ability text (no `ModKeyMappings` / client key bindings on dedicated server during Polymer tooltip build).
+- **Toggle trinkets (Polymer clients)**: Universal Attractor, night vision goggles, and similar items default to **on** (Artifacts’ toggle key is client-only).
 
 Workarounds in source are tagged `POLYMER WORKAROUND:` (grep the repo). **Chorus totem / equipable totem** death protection is fully server-side in Artifacts and needs no patch workaround.
 
@@ -58,7 +59,7 @@ Workarounds in source are tagged `POLYMER WORKAROUND:` (grep the repo). **Chorus
 | Artifact abilities / combat | **Server-side**; should function; client-only feedback may be missing |
 | Aqua dashers water sprint | **Server-side** fluid collision only; Polymer clients do not get Artifacts’ client walk-on-water presentation |
 | Mimic mob | **Partial**; static **chest** block display (no open/attack animation, no Artifacts mimic model) |
-| Artifact toggle key / config UI | **Not available** on vanilla clients |
+| Artifact toggle key / config UI | **Not available** on vanilla clients; toggle trinkets are forced **on** while equipped |
 | Custom sounds at player | Server plays sounds; duplicate client packet is skipped for vanilla |
 | Campsite structures / worldgen | **Server-only** registries; clients do not need Artifacts blocks |
 
