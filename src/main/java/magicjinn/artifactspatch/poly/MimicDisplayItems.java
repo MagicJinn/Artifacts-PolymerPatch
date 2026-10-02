@@ -35,7 +35,7 @@ public final class MimicDisplayItems {
 		Item item = Registry.register(
 				BuiltInRegistries.ITEM,
 				key,
-				new Item(new Item.Properties())
+				new Item(new Item.Properties().setId(key))
 		);
 		// POLYMER WORKAROUND: Vanilla clients receive trial_key + bridged model from the pack, not this registry id.
 		RegistrySyncUtils.setServerEntry(BuiltInRegistries.ITEM, item);
