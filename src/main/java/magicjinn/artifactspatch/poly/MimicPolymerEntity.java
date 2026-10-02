@@ -11,7 +11,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 
 // POLYMER WORKAROUND: Visual stand-in for MimicEntity on clients without Artifacts. Wire type is INTERACTION
-// (invisible, sized hitbox); hinged lid + bottom ItemDisplays follow MimicModel mouth angles from ticksInAir.
+// (invisible, sized hitbox); a static vanilla chest BlockDisplay is the placeholder visual.
 // Tracked data is cleared so polymer clients do not decode mimic fields.
 public final class MimicPolymerEntity implements PolymerEntity {
 	/** Matches ModEntityTypes.MIMIC EntityType.Builder.sized(0.875f, 0.875f). */
@@ -21,16 +21,16 @@ public final class MimicPolymerEntity implements PolymerEntity {
 
 	public MimicPolymerEntity(MimicEntity mimic) {
 		this.mimic = mimic;
-		this.attachChestDisplays();
+		this.attachPlaceholderVisual();
 	}
 
-	private void attachChestDisplays() {
+	private void attachPlaceholderVisual() {
 		if (mimic.level().isClientSide()) {
 			return;
 		}
 
-		var holder = new MimicPolymerChestHolder(mimic);
-		IdentifiedUniqueEntityAttachment.ofTicking(ArtifactsPolymerPatch.id("mimic_chest"), holder, mimic);
+		var holder = new MimicPolymerChestPlaceholder(mimic);
+		IdentifiedUniqueEntityAttachment.of(ArtifactsPolymerPatch.id("mimic_chest"), holder, mimic);
 	}
 
 	@Override
