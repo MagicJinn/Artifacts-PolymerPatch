@@ -45,7 +45,7 @@ Optional on the **server**: [Accessories](https://modrinth.com/mod/accessories),
 - **Everlasting beef / eternal steak**: polymer wire type is vanilla beef (eat animation); after eat the server shrinks once and refills the slot like a bottle remainder so client prediction matches.
 - **Tooltips**: server-safe helium flamingo ability text (no `ModKeyMappings` / client key bindings on dedicated server during Polymer tooltip build).
 - **Toggle trinkets (Polymer clients)**: Universal Attractor, night vision goggles, and similar items default to **on** (Artifacts’ toggle key is client-only).
-- **Universal Attractor magnet (Polymer clients)**: extra item motion/position/take/remove packets so ground loot visibly pulls in and leaves the world (Artifacts magnetism only adjusts server velocity in the mob effect tick).
+- **Universal Attractor magnet (Polymer clients)**: force toggle trinkets on for ability ticks, run server-side magnet/pickup each tick when equipped, and resync item motion, removal, and inventory (`ContainerSetContent`) to the viewer (without this, loot can sit as client ghosts while the server already collected it until relog).
 - **Aqua dashers (Polymer clients)**: per-viewer **client-only** waterlogged `barrier` footing via `ClientboundBlockUpdatePacket` while water-sprinting (server uses Artifacts fluid collision; world blocks unchanged).
 
 Workarounds in source are tagged `POLYMER WORKAROUND:` (grep the repo). **Chorus totem / equipable totem** death protection is fully server-side in Artifacts and needs no patch workaround.
