@@ -12,12 +12,17 @@ base {
 
 def artifactsFabricJar = layout.projectDirectory.file('libs/artifacts-fabric-15.1.3.jar')
 
-tasks.register('downloadArtifacts', Copy) {
+tasks.register('downloadArtifacts') {
 	def dest = artifactsFabricJar.asFile
+	outputs.file(dest)
 	onlyIf { !dest.exists() }
-	from(uri('https://cdn.modrinth.com/data/P0Mu4wcQ/versions/RAHdA2ed/artifacts-fabric-15.1.3.jar'))
-	into dest.parentFile
-	rename { 'artifacts-fabric-15.1.3.jar' }
+	doLast {
+		dest.parentFile.mkdirs()
+		ant.get(
+			src: 'https://cdn.modrinth.com/data/P0Mu4wcQ/versions/RAHdA2ed/artifacts-fabric-15.1.3.jar',
+			dest: dest
+		)
+	}
 }
 
 tasks.named('compileJava').configure {
