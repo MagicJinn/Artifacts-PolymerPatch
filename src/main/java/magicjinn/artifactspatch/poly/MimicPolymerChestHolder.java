@@ -12,8 +12,10 @@ import org.joml.Vector3f;
 
 // POLYMER WORKAROUND: Hinged mimic lid + bottom ItemDisplays using pack models from artifacts:entity/mimic.
 public final class MimicPolymerChestHolder extends ElementHolder {
-	private static final float MIMIC_SCALE = 14f / 16f;
-	private static final Vector3f PART_SCALE = new Vector3f(MIMIC_SCALE, MIMIC_SCALE, MIMIC_SCALE);
+	// Model quads span 12/16 blocks; ItemDisplay FIXED renders smaller than 1:1. ~2.25× ≈ mimic hitbox width (0.875 m).
+	private static final float PART_MODEL_SCALE = 2.25f;
+	private static final Vector3f PART_SCALE = new Vector3f(PART_MODEL_SCALE, PART_MODEL_SCALE, PART_MODEL_SCALE);
+	private static final float DISPLAY_SIZE = 0.875f;
 	private static final Vector3f MOUTH_PIVOT = new Vector3f(0.0f, 0.38f, 0.02f);
 	private static final Vector3f BOTTOM_FROM_PIVOT = new Vector3f(0.0f, -0.14f, -0.26f);
 	private static final Vector3f LID_FROM_PIVOT = new Vector3f(0.0f, 0.12f, -0.26f);
@@ -36,6 +38,7 @@ public final class MimicPolymerChestHolder extends ElementHolder {
 		element.setBillboardMode(Display.BillboardConstraints.FIXED);
 		element.setInterpolationDuration(1);
 		element.setTeleportDuration(1);
+		element.setDisplaySize(DISPLAY_SIZE, DISPLAY_SIZE);
 		return element;
 	}
 
