@@ -1,6 +1,7 @@
 package magicjinn.artifactspatch;
 
 import artifacts.Artifacts;
+import magicjinn.artifactspatch.poly.PolymerFoodUseGuard;
 import magicjinn.artifactspatch.res.ResourcePackSetup;
 import magicjinn.artifactspatch.worn.PlayerWornArtifactsDisplay;
 import eu.pb4.polymer.core.api.utils.PolymerUtils;
@@ -19,6 +20,7 @@ public class ArtifactsPolymerPatch implements ModInitializer {
 		PolymerResourcePackUtils.addModAssets(Artifacts.MOD_ID);
 		PolymerResourcePackUtils.addModAssets(MOD_ID);
 		ResourcePackSetup.register();
+		PolymerFoodUseGuard.register();
 
 		PolymerUtils.markAsServerOnlyRegistry(Registries.FEATURE);
 		PlayerWornArtifactsDisplay.register();

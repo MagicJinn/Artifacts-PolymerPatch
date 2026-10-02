@@ -15,7 +15,9 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -78,10 +80,16 @@ public final class PlayerWornArtifactsDisplay {
 			return;
 		}
 
+		List<String> removedKeys = new ArrayList<>();
 		for (var entry : state.elements.entrySet()) {
 			if (!equipped.containsKey(entry.getKey())) {
-				state.holder.removeElement(entry.getValue());
-				state.elements.remove(entry.getKey());
+				removedKeys.add(entry.getKey());
+			}
+		}
+		for (String key : removedKeys) {
+			ItemDisplayElement element = state.elements.remove(key);
+			if (element != null) {
+				state.holder.removeElement(element);
 			}
 		}
 

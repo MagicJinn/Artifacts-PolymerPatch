@@ -27,6 +27,13 @@ public record PolyArtifactsItem(Item item) implements VanillaModeledPolymerItem 
 			"eternal_steak"
 	);
 
+	public static boolean isNonPolymerFood(ItemStack stack) {
+		if (stack.isEmpty()) {
+			return false;
+		}
+		return NON_POLYMER_FOOD_ITEMS.contains(BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath());
+	}
+
 	@Override
 	public Item getPolymerItem(ItemStack itemStack, PacketContext packetContext) {
 		return Items.TRIAL_KEY;
