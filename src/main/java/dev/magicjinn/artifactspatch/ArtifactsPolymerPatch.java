@@ -2,6 +2,7 @@ package dev.magicjinn.artifactspatch;
 
 import artifacts.Artifacts;
 import dev.magicjinn.artifactspatch.res.ResourcePackSetup;
+import dev.magicjinn.artifactspatch.worn.PlayerWornArtifactsDisplay;
 import eu.pb4.polymer.core.api.utils.PolymerUtils;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.fabricmc.api.ModInitializer;
@@ -20,6 +21,7 @@ public class ArtifactsPolymerPatch implements ModInitializer {
 		ResourcePackSetup.register();
 
 		PolymerUtils.markAsServerOnlyRegistry(Registries.FEATURE);
+		PlayerWornArtifactsDisplay.register();
 		LOGGER.info("Artifacts Polymer patch initialized");
 	}
 

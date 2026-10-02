@@ -21,7 +21,7 @@ Inspired by [PolymerPorts](https://github.com/PolymerPorts) patches such as [cc-
 | [Fabric API](https://modrinth.com/mod/fabric-api) | Required |
 | [Trinkets Updated](https://modrinth.com/mod/trinkets-updated) | Strongly recommended; Artifacts equips many items as trinkets on Fabric |
 
-Optional: [Accessories](https://modrinth.com/mod/accessories), [Polymer AutoHost](https://modrinth.com/mod/polymer) for automatic resource pack hosting.
+Optional: [Trinkets Polymer](https://modrinth.com/mod/trinkets-polymer) (trinket slot UI/sync), [Accessories](https://modrinth.com/mod/accessories), [Polymer AutoHost](https://modrinth.com/mod/polymer) for automatic resource pack hosting.
 
 ## Install
 
@@ -33,8 +33,9 @@ Optional: [Accessories](https://modrinth.com/mod/accessories), [Polymer AutoHost
 ## What this patch does
 
 - **Mixin** on Artifacts’ `FabricRegister` to register Polymer overlays when Artifacts registers content (items, entities, sounds, data components, attributes, etc.).
-- **Items**: `VanillaModeledPolymerItem` overlays with Artifacts assets bridged into the Polymer pack (`PolymerResourcePackUtils.addModAssets("artifacts")`).
-- **Mimic entity**: custom `PolymerEntity` overlay (visual placeholder; see limitations).
+- **Items (held / inventory)**: `VanillaModeledPolymerItem` overlays with Artifacts `assets/artifacts/items` models bridged into the Polymer pack, including server-side `artifacts:needs_repair` item model property.
+- **Worn trinkets (player body)**: when **Trinkets Updated** is present, `ItemDisplayElement`s attached to players show equipped Artifacts using those same item models (approximate slot offsets; not Artifacts’ custom 3D armor models).
+- **Mimic entity**: chest `BlockDisplayElement` on the real mimic (see limitations).
 - **Networking**: skips Artifacts **clientbound** custom payloads when the client cannot receive them (avoids disconnects on vanilla clients).
 - **CCA**: limits `SwimDataComponent` sync to clients that can receive Artifacts swim packets.
 
@@ -43,15 +44,18 @@ Optional: [Accessories](https://modrinth.com/mod/accessories), [Polymer AutoHost
 | Area | Status |
 |------|--------|
 | Joining the server | **Works** with Polymer pack when networking/registries are patched |
-| Artifact items in inventory / trinkets | **Mostly works**; models/textures from Artifacts pack, vanilla item type on wire (`trial_key` base) |
+| Artifact items in inventory / hotbar | **Works** for item-model-based Artifacts (Polymer pack + `trial_key` wire type) |
+| Trinket slot UI (equip screen) | Use **[Trinkets Polymer](https://modrinth.com/mod/trinkets-polymer)**; not implemented in this mod |
+| Worn Artifacts on player body | **Partial** with Trinkets Updated: floating **item displays** at slot offsets (not hat/glove 3D meshes from Artifacts client) |
 | Artifact abilities / combat | **Server-side**; should function; client-only feedback may be missing |
-| Mimic mob | **Partial**; static **chest** block display on a hidden armor stand (no open/attack animation, no Artifacts mimic model) |
-| Equipped trinket rendering on player | **Limited** without Artifacts client or extra Polymer virtual-entity work |
+| Mimic mob | **Partial**; static **chest** block display (no open/attack animation, no Artifacts mimic model) |
 | Artifact toggle key / config UI | **Not available** on vanilla clients |
 | Custom sounds at player | Server plays sounds; duplicate client packet is skipped for vanilla |
 | Campsite structures / worldgen | **Server-only** registries; clients do not need Artifacts blocks |
 
-This is an incremental patch: it compiles and covers the main registry and item/entity polymerization path. Further work (mimic animations/facing, trinket body rendering, Accessories UI) is expected.
+Further work: Artifacts-style body meshes (per-item renderers), slot-accurate posing, Accessories path, mimic animations.
+
+**Without Trinkets Updated on the server**, worn displays are skipped (Artifacts trinket slots are unavailable anyway). **Without Trinkets Polymer on the client**, slot menus may still be awkward, but item models and worn displays can still appear once the Polymer pack is accepted.
 
 ## Building
 

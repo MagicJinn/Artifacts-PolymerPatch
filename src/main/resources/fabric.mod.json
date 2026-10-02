@@ -32,6 +32,7 @@
 	},
 	"suggests": {
 		"trinkets_updated": "*",
+		"trinkets-polymer-patch": "*",
 		"accessories": "*"
 	}
 }
