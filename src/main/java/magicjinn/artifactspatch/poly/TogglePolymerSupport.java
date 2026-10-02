@@ -25,9 +25,6 @@ public final class TogglePolymerSupport {
 	}
 
 	private static void tick(MinecraftServer server) {
-		if ((server.getTickCount() & 0b1111) != 0) {
-			return;
-		}
 		for (ServerPlayer player : server.getPlayerList().getPlayers()) {
 			if (!PolymerClientChecks.lacksArtifactsClient(player)) {
 				continue;
@@ -36,7 +33,7 @@ public final class TogglePolymerSupport {
 		}
 	}
 
-	private static void enableEquippedToggles(ServerPlayer player) {
+	public static void enableEquippedToggles(ServerPlayer player) {
 		var disabledKey = ModDataComponents.DISABLED_BY_TOGGLE.get();
 		var toggleKey = ModDataComponents.TOGGLE_KEY.get();
 		TrinketsApi.getAttachment(player).forEach((TrinketSlotAccess slot, ItemStack stack) -> {
