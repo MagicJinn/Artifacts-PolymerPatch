@@ -4,8 +4,10 @@
     32
   ],
   "textures": {
-    "mimic": "artifacts:entity/mimic"
+    "particle": "artifacts-polymer-patch:item/mimic",
+    "mimic": "artifacts-polymer-patch:item/mimic"
   },
+  "gui_light": "front",
   "elements": [
     {
       "from": [
@@ -26,8 +28,7 @@
             6.0,
             13.5
           ],
-          "texture": "#mimic",
-          "cullface": false
+          "texture": "#mimic"
         },
         "up": {
           "uv": [
@@ -36,8 +37,7 @@
             9.0,
             7.5
           ],
-          "texture": "#mimic",
-          "cullface": false
+          "texture": "#mimic"
         },
         "west": {
           "uv": [
@@ -46,8 +46,7 @@
             3.0,
             15.0
           ],
-          "texture": "#mimic",
-          "cullface": false
+          "texture": "#mimic"
         },
         "north": {
           "uv": [
@@ -56,8 +55,7 @@
             6.0,
             15.0
           ],
-          "texture": "#mimic",
-          "cullface": false
+          "texture": "#mimic"
         },
         "east": {
           "uv": [
@@ -66,8 +64,7 @@
             9.0,
             15.0
           ],
-          "texture": "#mimic",
-          "cullface": false
+          "texture": "#mimic"
         },
         "south": {
           "uv": [
@@ -76,8 +73,7 @@
             12.0,
             15.0
           ],
-          "texture": "#mimic",
-          "cullface": false
+          "texture": "#mimic"
         }
       }
     },
@@ -100,8 +96,7 @@
             12.0,
             13.5
           ],
-          "texture": "#mimic",
-          "cullface": false
+          "texture": "#mimic"
         },
         "down": {
           "uv": [
@@ -110,8 +105,7 @@
             12.0,
             13.5
           ],
-          "texture": "#mimic",
-          "cullface": false
+          "texture": "#mimic"
         }
       }
     }
