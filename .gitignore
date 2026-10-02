@@ -34,6 +34,10 @@ bin/
 
 run/
 
+# accidental extractions at repo root
+/artifacts/
+/eu/
+
 # java
 
 hs_err_*.log
