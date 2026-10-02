@@ -21,10 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-/**
- * Attaches {@link ItemDisplayElement}s to players for equipped Artifacts trinkets (item models from the Polymer pack).
- * Requires Trinkets Updated on the server so Artifacts can occupy trinket slots; Trinkets Polymer handles slot UI separately.
- */
+// POLYMER WORKAROUND: Artifacts' per-item 3D worn models are client-only. Attach ItemDisplayElements at trinket
+// slot offsets using Polymer pack item models. Trinkets Polymer (separate mod) handles equip UI for vanilla clients.
 public final class PlayerWornArtifactsDisplay {
 	private static final Map<UUID, WornState> STATES = new HashMap<>();
 

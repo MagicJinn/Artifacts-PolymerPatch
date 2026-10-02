@@ -8,10 +8,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
-/**
- * Mirrors Artifacts' fabric tool-tier mixin so dedicated-server logic stays consistent for Polymer players.
- * (Artifacts fabric mixin; same behavior for harvest checks.)
- */
+// POLYMER WORKAROUND: Artifacts' Fabric tool-tier mixin is client-only; vanilla clients gate harvest on local
+// tool tier. Mirror digging claws tier upgrade on the server so drops match Artifacts behavior.
 @Mixin(Player.class)
 public abstract class PlayerToolTierPolymerMixin {
 	@ModifyReturnValue(method = "hasCorrectToolForDrops", at = @At("RETURN"))

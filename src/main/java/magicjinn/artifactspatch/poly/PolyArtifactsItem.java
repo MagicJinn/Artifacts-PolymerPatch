@@ -4,8 +4,8 @@ import artifacts.Artifacts;
 import eu.pb4.polymer.core.api.item.VanillaModeledPolymerItem;
 import eu.pb4.polymer.resourcepack.extras.api.ResourcePackExtras;
 import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.Identifier;
@@ -33,6 +33,8 @@ public record PolyArtifactsItem(Item item) implements VanillaModeledPolymerItem 
 		return NON_POLYMER_FOOD_ITEMS.contains(BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath());
 	}
 
+	// POLYMER WORKAROUND: Vanilla clients have no Artifacts item ids; trial_key is a vanilla type that accepts
+	// custom item models from the Polymer pack (Artifacts models bridged via ResourcePackExtras).
 	@Override
 	public Item getPolymerItem(ItemStack itemStack, PacketContext packetContext) {
 		return Items.TRIAL_KEY;
@@ -45,16 +47,27 @@ public record PolyArtifactsItem(Item item) implements VanillaModeledPolymerItem 
 	}
 
 	@Override
+	public boolean shouldStorePolymerItemStackCount() {
+		// POLYMER WORKAROUND: Everlasting food may send an inflated wire count; Polymer must store the real count.
+		return PolyArtifactsItem.isNonPolymerFood(item.getDefaultInstance());
+	}
+
+	@Override
 	public void modifyBasePolymerItemStack(
 			ItemStack original,
 			ItemStack polymer,
 			PacketContext context,
 			HolderLookup.Provider lookup
 	) {
-		// Keep FOOD/CONSUMABLE on polymer stacks so vanilla clients can start eating;
-		// {@link PolymerFoodUseGuard} prevents desync via a brief stack size of 2.
+		// POLYMER WORKAROUND: Keep FOOD/CONSUMABLE on polymer stacks so vanilla clients can eat; wire count
+		// inflation for count-1 stacks is handled in {@link PolymerEverlastingFoodSupport}.
+		if (PolymerEverlastingFoodSupport.appliesTo(context, original)) {
+			PolymerEverlastingFoodSupport.inflatePolymerStackCountForClient(original, polymer);
+		}
 	}
 
+	// POLYMER WORKAROUND: Trinkets Polymer is a server dependency; vanilla clients cannot install Trinkets, so
+	// Artifacts' "missing dependency" tooltip line is misleading on the Polymer pack.
 	@Override
 	public void modifyClientTooltip(List<Component> tooltip, ItemStack stack, PacketContext context) {
 		tooltip.removeIf(PolyArtifactsItem::isMissingTrinketsDependencyLine);

@@ -9,6 +9,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+// POLYMER WORKAROUND: Aqua dashers water sprint needs client collision feedback; spawn owner-only virtual
+// interaction deck (see AquaDashersPolymerSupport) because vanilla clients lack Artifacts fluid collision.
 @Mixin(Player.class)
 public class PlayerAquaDashersPolymerMixin {
 	@Inject(method = "tick", at = @At("TAIL"))

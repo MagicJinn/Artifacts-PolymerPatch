@@ -11,6 +11,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+// POLYMER WORKAROUND: After Artifacts applies equipment attribute modifiers server-side, sync attributes to
+// Polymer/vanilla clients (they do not run Artifacts client attribute logic).
 @Mixin(EquipmentAttributeModifier.Ticker.class)
 public class EquipmentAttributeModifierTickerMixin {
 	@Inject(

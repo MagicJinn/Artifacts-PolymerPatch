@@ -9,6 +9,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
+// POLYMER WORKAROUND: Vanilla clients use local BLOCK_BREAK_SPEED for mining progress; scale server destroy
+// progress so break time matches Artifacts' server-side digging claws bonus (see DiggingClawsPolymerSupport).
 @Mixin(ServerPlayerGameMode.class)
 public abstract class ServerPlayerGameModeDigSpeedMixin {
 	@ModifyReturnValue(method = "incrementDestroyProgress", at = @At("RETURN"))

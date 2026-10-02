@@ -5,12 +5,12 @@
 	"mixins": [
 		"EquipmentAttributeModifierTickerMixin",
 		"FabricRegisterMixin",
-		"LivingEntityFoodUseMixin",
 		"NetworkHandlerMixin",
 		"PlayerAquaDashersPolymerMixin",
 		"PlayerToolTierPolymerMixin",
 		"ServerPlayerGameModeDigSpeedMixin",
 		"SwimDataComponentMixin",
+		"SwimInAirTooltipMixin",
 		"accessor.ServerPlayerGameModeAccessor"
 	],
 	"injectors": {

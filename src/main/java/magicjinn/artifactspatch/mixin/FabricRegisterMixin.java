@@ -49,15 +49,18 @@ public abstract class FabricRegisterMixin<R> {
 		R value = holder.value();
 
 		if (registryKey.equals(Registries.ITEM)) {
+			// POLYMER WORKAROUND: Register per-item polymer overlays when Artifacts binds registries (see PolyArtifactsItem).
 			Item item = (Item) value;
 			PolymerItem.registerOverlay(item, new PolyArtifactsItem(item));
 		} else if (registryKey.equals(Registries.ENTITY_TYPE)) {
 			@SuppressWarnings("unchecked")
 			EntityType<?> entityType = (EntityType<?>) value;
 			if (entityType == ModEntityTypes.MIMIC.get()) {
+				// POLYMER WORKAROUND: Mimic uses a custom polymer entity (MARKER + virtual chest); see MimicPolymerEntity.
 				PolymerEntityUtils.registerType(entityType);
 				PolymerEntityUtils.registerOverlay((EntityType<MimicEntity>) entityType, MimicPolymerEntity::new);
 			} else {
+				// POLYMER WORKAROUND: Other Artifacts entities have no client mod; hide as vanilla armor stands on the wire.
 				PolymerEntityUtils.registerOverlay(entityType, entity -> context -> EntityType.ARMOR_STAND);
 			}
 		} else if (registryKey.equals(Registries.SOUND_EVENT)) {
@@ -93,6 +96,8 @@ public abstract class FabricRegisterMixin<R> {
 			if (!Artifacts.MOD_ID.equals(key.identifier().getNamespace())) {
 				return;
 			}
+			// POLYMER WORKAROUND: Mark Artifacts registry entries as server-only where needed so vanilla clients
+			// are not sent unknown ids (paired with polymer overlays for visible content).
 			@SuppressWarnings("unchecked")
 			Registry<R> registry = (Registry<R>) BuiltInRegistries.REGISTRY.getValue(registryKey.identifier());
 			if (registry != null) {

@@ -20,10 +20,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Packet-only support deck for aqua-dashers water sprint (Polymer clients only).
- * Visible and synced only to the owning player via {@link ElementHolder#startWatching}.
- */
+// POLYMER WORKAROUND: Packet-only support deck for aqua-dashers water sprint (Polymer clients only). Real boats
+// caused entity-data disconnects; this owner-only InteractionElement deck is synced via startWatching only.
 public final class AquaDashersPolymerSupport {
 	private static final double DECK_ABOVE_SURFACE = 1.0 / 16.0;
 	private static final float DECK_WIDTH = 1.375F;

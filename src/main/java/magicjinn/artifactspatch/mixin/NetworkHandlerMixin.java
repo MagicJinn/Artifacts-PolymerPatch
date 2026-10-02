@@ -9,10 +9,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-/**
- * Artifacts clientbound payloads are only registered when the Artifacts client mod is present.
- * Skip sending them to vanilla / non-Artifacts clients so they are not disconnected.
- */
+// POLYMER WORKAROUND: Artifacts clientbound payloads are only registered when the Artifacts client mod is
+// present. Skip sending them to vanilla / non-Artifacts clients so they are not disconnected.
 @Mixin(NetworkHandler.class)
 public class NetworkHandlerMixin {
 	@Inject(method = "sendToPlayer", at = @At("HEAD"), cancellable = true)

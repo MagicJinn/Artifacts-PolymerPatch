@@ -14,10 +14,8 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 
-/**
- * Visual stand-in for {@link MimicEntity} on clients without Artifacts installed.
- * Polymer base type is {@link EntityType#MARKER} (invisible); chest is a virtual block display.
- */
+// POLYMER WORKAROUND: Visual stand-in for MimicEntity on clients without Artifacts. Wire type is MARKER
+// (invisible); chest is a virtual BlockDisplay. Tracked data is cleared so polymer clients do not decode mimic fields.
 public final class MimicPolymerEntity implements PolymerEntity {
 	private static final float MIMIC_SIZE = 14 / 16F;
 
@@ -61,7 +59,7 @@ public final class MimicPolymerEntity implements PolymerEntity {
 		if (!PolymerClientChecks.lacksArtifactsClient(player)) {
 			return;
 		}
-		// Mimic is a living entity server-side; clients see a marker with no custom fields.
+		// POLYMER WORKAROUND: Mimic is a living entity server-side; polymer clients see a marker with no custom fields.
 		data.clear();
 	}
 }

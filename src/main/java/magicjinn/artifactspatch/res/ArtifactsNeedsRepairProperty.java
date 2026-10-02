@@ -5,9 +5,7 @@ import com.mojang.serialization.MapCodec;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.property.bool.BooleanProperty;
 import net.minecraft.world.item.ItemStack;
 
-/**
- * Server-side stand-in for Artifacts' {@code artifacts:needs_repair} client item model property.
- */
+// POLYMER WORKAROUND: Server-side stand-in for Artifacts' artifacts:needs_repair client item model property.
 public record ArtifactsNeedsRepairProperty() implements BooleanProperty {
 	public static final MapCodec<ArtifactsNeedsRepairProperty> MAP_CODEC = MapCodec.unit(new ArtifactsNeedsRepairProperty());
 

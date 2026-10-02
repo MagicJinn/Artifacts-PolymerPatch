@@ -15,6 +15,7 @@ public final class ResourcePackSetup {
 	}
 
 	public static void register() {
+		// POLYMER WORKAROUND: Server-side bool property for pack generation; vanilla clients cannot load artifacts:needs_repair.
 		BooleanProperty.TYPES.put(Artifacts.id("needs_repair"), ArtifactsNeedsRepairProperty.MAP_CODEC);
 
 		ResourcePackExtras.forDefault().addBridgedModelsFolder(Artifacts.id("item"), (id, builder) ->
@@ -26,6 +27,7 @@ public final class ResourcePackSetup {
 		);
 	}
 
+	// POLYMER WORKAROUND: Artifacts item models reference artifacts:needs_repair; rewrite to plain models for the Polymer pack.
 	private static PackResource stripNeedsRepairItemModels(String path, PackResource resource) {
 		if (!path.startsWith(ARTIFACTS_ITEMS_PREFIX) || !path.endsWith(".json")) {
 			return resource;

@@ -10,10 +10,8 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.block.state.BlockState;
 
-/**
- * Vanilla clients gate mining on local {@link Attributes#BLOCK_BREAK_SPEED}; Artifacts applies bonuses server-side only.
- * Scale server destroy progress so break time matches the server's attribute value.
- */
+// POLYMER WORKAROUND: Vanilla clients gate mining on local BLOCK_BREAK_SPEED; Artifacts applies digging claws
+// bonuses server-side only. Scale server destroy progress so break time matches the server's attribute value.
 public final class DiggingClawsPolymerSupport {
 	private DiggingClawsPolymerSupport() {
 	}
