@@ -1,13 +1,11 @@
 {
 	"required": true,
 	"package": "magicjinn.artifactspatch.mixin",
-	"plugin": "magicjinn.artifactspatch.mixin.ArtifactsPolymerPatchMixinPlugin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
 		"FabricRegisterMixin",
 		"NetworkHandlerMixin",
-		"SwimDataComponentMixin",
-		"TrinketsMainMixin"
+		"SwimDataComponentMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

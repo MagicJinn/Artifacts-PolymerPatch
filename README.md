@@ -20,14 +20,15 @@ Inspired by [PolymerPorts](https://github.com/PolymerPorts) patches such as [cc-
 | [Polymer](https://modrinth.com/mod/polymer) (bundled or modules) | Required |
 | [Fabric API](https://modrinth.com/mod/fabric-api) | Required |
 | [Trinkets Updated](https://modrinth.com/mod/trinkets-updated) | Strongly recommended; Artifacts equips many items as trinkets on Fabric |
+| [Trinkets Polymer](https://modrinth.com/mod/trinkets-polymer) | **Required on the server** whenever Trinkets Updated is installed — handles Fabric registry sync and player inventory/menu slot count for vanilla clients (server-only mod; clients install nothing) |
 
-Optional on the **server**: [Trinkets Polymer](https://modrinth.com/mod/trinkets-polymer) (Polymer-friendly trinket equip UI for non-Trinkets clients; **not** required on vanilla clients), [Accessories](https://modrinth.com/mod/accessories), [Polymer AutoHost](https://modrinth.com/mod/polymer) for automatic resource pack hosting.
+Optional on the **server**: [Accessories](https://modrinth.com/mod/accessories), [Polymer AutoHost](https://modrinth.com/mod/polymer) for automatic resource pack hosting.
 
 **Vanilla clients** need no mods (no Fabric API, no Trinkets). Accept the Polymer resource pack when prompted.
 
 ## Install
 
-1. Install Artifacts, Polymer, Fabric API, and Trinkets Updated on the **server**.
+1. Install Artifacts, Polymer, Fabric API, **Trinkets Updated**, and **[Trinkets Polymer](https://modrinth.com/mod/trinkets-polymer)** on the **server** (Trinkets Polymer is not optional if you run Trinkets Updated with vanilla clients).
 2. Add **artifacts-polymer-patch** to the server `mods` folder (build with `./gradlew build`, jar under `build/libs/`).
 3. Ensure clients accept the Polymer resource pack (AutoHost, or `/polymer generate-packs` and host the pack yourself).
 4. Clients **do not** need Artifacts installed.
@@ -57,9 +58,9 @@ Optional on the **server**: [Trinkets Polymer](https://modrinth.com/mod/trinkets
 
 Further work: Artifacts-style body meshes (per-item renderers), slot-accurate posing, Accessories path, mimic animations.
 
-**Without Trinkets Updated on the server**, worn displays are skipped (Artifacts trinket slots are unavailable anyway). This patch marks Trinkets `trinkets:*` data components as **server-only** in Fabric Registry Sync so vanilla clients are not kicked when Trinkets Updated is on the server.
+**Without Trinkets Updated on the server**, worn displays are skipped (Artifacts trinket slots are unavailable anyway).
 
-**Without Trinkets Polymer on the server**, vanilla clients cannot open a full trinket equip menu (commands/creative may still apply items); worn body displays still work when items are equipped server-side.
+**Without [Trinkets Polymer](https://modrinth.com/mod/trinkets-polymer) on the server** (while Trinkets Updated is present), vanilla clients typically disconnect on join (extra inventory slots / registry sync). Trinkets Polymer is a separate **server** mod; do not install it on vanilla clients.
 
 ## Building
 
@@ -67,11 +68,14 @@ Further work: Artifacts-style body meshes (per-item renderers), slot-accurate po
 ./gradlew build
 ```
 
-The build downloads `artifacts-fabric-15.1.3.jar` into `libs/` on first compile (Modrinth Maven’s `15.1.3` coordinate is not the Fabric jar).
+The build downloads into `libs/` on first compile:
+
+- `artifacts-fabric-15.1.3.jar` (Modrinth Maven’s `15.1.3` coordinate is not the Fabric jar)
+- `trinkets-polymer-patch-4.0.0-rc.1.0+26.1.jar` ([Trinkets Polymer](https://modrinth.com/mod/trinkets-polymer), not on Maven)
 
 ### Local server (`runServer`)
 
-Gradle pulls **[Trinkets Updated](https://modrinth.com/mod/trinkets-updated)** (`eu.pb4:trinkets:4.0.1+26.1` from [Nucleoid Maven](https://maven.nucleoid.xyz/)) as a runtime dependency so `./gradlew runServer` can equip Artifacts like a real server. Optional: add [Trinkets Polymer](https://modrinth.com/mod/trinkets-polymer) to the run `mods` folder for vanilla-client trinket slot UI (not bundled here).
+Gradle pulls **[Trinkets Updated](https://modrinth.com/mod/trinkets-updated)** and **Trinkets Polymer** as runtime dependencies so `./gradlew runServer` matches a recommended production server (Artifacts trinkets + vanilla join).
 
 ## License
 
