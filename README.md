@@ -59,7 +59,7 @@ Workarounds in source are tagged `POLYMER WORKAROUND:` (grep the repo). **Chorus
 | Worn Artifacts on player body | **Not shown** (Artifacts client 3D meshes only; Polymer virtual item displays were removed as unstable) |
 | Artifact abilities / combat | **Server-side**; should function; client-only feedback may be missing |
 | Aqua dashers water sprint | **Server** fluid collision + **client-predicted** footing (fake waterlogged barriers for that viewer only) |
-| Mimic mob | **Partial**; hinged **mimic** lid/bottom ItemDisplays (`mimic.png` geometry; inner teeth quads baked in; no `MimicChestMaterials` wood variants) |
+| Mimic mob | **Partial**; hinged **mimic** lid/bottom ItemDisplays (`mimic_opaque.png` cuboids; no `MimicChestMaterials` wood variants) |
 | Artifact toggle key / config UI | **Not available** on vanilla clients; toggle trinkets are forced **on** while equipped |
 | Custom sounds at player | Server plays sounds; duplicate client packet is skipped for vanilla |
 | Campsite structures / worldgen | **Server-only** registries; clients do not need Artifacts blocks |

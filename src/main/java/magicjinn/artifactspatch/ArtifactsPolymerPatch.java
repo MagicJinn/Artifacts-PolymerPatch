@@ -5,8 +5,6 @@ import magicjinn.artifactspatch.command.ArtifactsDebugCommand;
 import magicjinn.artifactspatch.poly.PolymerClientChecks;
 import magicjinn.artifactspatch.poly.PolymerPlayerAttributeSync;
 import magicjinn.artifactspatch.poly.AquaDashersClientBarrierSupport;
-import magicjinn.artifactspatch.poly.MimicDisplayBlockPack;
-import magicjinn.artifactspatch.poly.MimicDisplayBlocks;
 import magicjinn.artifactspatch.poly.MimicDisplayItems;
 import magicjinn.artifactspatch.poly.TogglePolymerSupport;
 import magicjinn.artifactspatch.res.ResourcePackSetup;
@@ -26,8 +24,6 @@ public class ArtifactsPolymerPatch implements ModInitializer {
 	public void onInitialize() {
 		PolymerResourcePackUtils.addModAssets(Artifacts.MOD_ID);
 		PolymerResourcePackUtils.addModAssets(MOD_ID);
-		MimicDisplayBlocks.register();
-		MimicDisplayBlockPack.register();
 		ResourcePackSetup.register();
 		MimicDisplayItems.register();
 

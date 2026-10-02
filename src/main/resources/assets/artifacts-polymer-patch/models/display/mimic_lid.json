@@ -4,8 +4,8 @@
     32
   ],
   "textures": {
-    "particle": "artifacts-polymer-patch:item/mimic",
-    "mimic": "artifacts-polymer-patch:item/mimic"
+    "particle": "artifacts-polymer-patch:item/mimic_opaque",
+    "mimic": "artifacts-polymer-patch:item/mimic_opaque"
   },
   "gui_light": "front",
   "elements": [

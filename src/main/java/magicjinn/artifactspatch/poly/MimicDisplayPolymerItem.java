@@ -9,11 +9,11 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
-// POLYMER WORKAROUND: Mimic lid/bottom ItemDisplay stacks use Artifacts mimic.png models from the generated pack.
+// POLYMER WORKAROUND: Mimic lid/bottom ItemDisplay stacks use opaque display models from the generated pack.
 public record MimicDisplayPolymerItem(Item item, Identifier modelId) implements VanillaModeledPolymerItem {
 	@Override
 	public Item getPolymerItem(ItemStack itemStack, PacketContext packetContext) {
-		// POLYMER WORKAROUND: Trial key generated item layer drew on top of custom cuboids; keep items invisible if used.
+		// POLYMER WORKAROUND: Barrier has no generated item sprite; only the bridged cuboid model is visible.
 		return Items.BARRIER;
 	}
 

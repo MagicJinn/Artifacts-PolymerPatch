@@ -28,8 +28,7 @@
 		"fabric-api": "*",
 		"artifacts": ">=15.1.3",
 		"polymer-core": "*",
-		"polymer-resource-pack": "*",
-		"polymer-blocks": "*"
+		"polymer-resource-pack": "*"
 	},
 	"suggests": {
 		"trinkets_updated": "*",

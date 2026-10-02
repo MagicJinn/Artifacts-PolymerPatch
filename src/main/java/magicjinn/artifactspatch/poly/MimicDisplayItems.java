@@ -37,7 +37,7 @@ public final class MimicDisplayItems {
 				key,
 				new Item(new Item.Properties().setId(key))
 		);
-		// POLYMER WORKAROUND: Vanilla clients receive trial_key + bridged model from the pack, not this registry id.
+		// POLYMER WORKAROUND: Vanilla clients receive barrier + bridged display model from the pack, not this registry id.
 		RegistrySyncUtils.setServerEntry(BuiltInRegistries.ITEM, item);
 		PolymerItem.registerOverlay(item, new MimicDisplayPolymerItem(item, ArtifactsPolymerPatch.id("display/" + modelPath)));
 		return item;
