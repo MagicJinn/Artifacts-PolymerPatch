@@ -37,7 +37,6 @@ Optional on the **server**: [Accessories](https://modrinth.com/mod/accessories),
 
 - **Mixin** on Artifacts’ `FabricRegister` to register Polymer overlays when Artifacts registers content (items, entities, sounds, data components, attributes, etc.).
 - **Items (held / inventory)**: `PolyArtifactsItem` overlays with Artifacts `assets/artifacts/items` models bridged into the Polymer pack, including server-side `artifacts:needs_repair` item model property.
-- **Mimic entity (Polymer clients)**: `INTERACTION` hitbox plus a static vanilla **chest** `BlockDisplay` placeholder (no custom mimic model yet).
 - **Networking**: skips Artifacts **clientbound** custom payloads when the client cannot receive them (avoids disconnects on vanilla clients).
 - **CCA**: limits `SwimDataComponent` sync to clients that can receive Artifacts swim packets.
 - **Digging claws (Polymer clients)**: server destroy-progress scaling so break time matches server `BLOCK_BREAK_SPEED` from Artifacts (vanilla clients still gate mining on local attributes).
@@ -59,12 +58,12 @@ Workarounds in source are tagged `POLYMER WORKAROUND:` (grep the repo). **Chorus
 | Worn Artifacts on player body | **Not shown** (Artifacts client 3D meshes only; Polymer virtual item displays were removed as unstable) |
 | Artifact abilities / combat | **Server-side**; should function; client-only feedback may be missing |
 | Aqua dashers water sprint | **Server** fluid collision + **client-predicted** footing (fake waterlogged barriers for that viewer only) |
-| Mimic mob | **Placeholder**; looks like a normal **chest** on vanilla clients (server mimic behavior unchanged) |
+| Mimic mob | **No patch visual**; same generic **armor stand** wire type as other Artifacts mobs (server mimic unchanged) |
 | Artifact toggle key / config UI | **Not available** on vanilla clients; toggle trinkets are forced **on** while equipped |
 | Custom sounds at player | Server plays sounds; duplicate client packet is skipped for vanilla |
 | Campsite structures / worldgen | **Server-only** registries; clients do not need Artifacts blocks |
 
-Further work: stable worn-trinket visuals, real mimic visuals for Polymer clients, Accessories path.
+Further work: stable worn-trinket visuals, Accessories path.
 
 **Without [Trinkets Polymer](https://modrinth.com/mod/trinkets-polymer) on the server** (while Trinkets Updated is present), vanilla clients typically disconnect on join (extra inventory slots / registry sync). Trinkets Polymer is a separate **server** mod; do not install it on vanilla clients.
 

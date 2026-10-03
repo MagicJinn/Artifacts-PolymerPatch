@@ -1,13 +1,10 @@
 package magicjinn.artifactspatch.mixin;
 
 import artifacts.Artifacts;
-import artifacts.entity.MimicEntity;
 import artifacts.fabric.registry.FabricRegister;
-import artifacts.registry.ModEntityTypes;
 import artifacts.registry.Register;
 import artifacts.registry.RegistryHolder;
 import eu.pb4.polymer.rsm.api.RegistrySyncUtils;
-import magicjinn.artifactspatch.poly.MimicPolymerEntity;
 import magicjinn.artifactspatch.poly.PolyArtifactsItem;
 import eu.pb4.polymer.core.api.entity.PolymerEntityUtils;
 import eu.pb4.polymer.core.api.item.PolymerCreativeModeTabUtils;
@@ -55,14 +52,8 @@ public abstract class FabricRegisterMixin<R> {
 		} else if (registryKey.equals(Registries.ENTITY_TYPE)) {
 			@SuppressWarnings("unchecked")
 			EntityType<?> entityType = (EntityType<?>) value;
-			if (entityType == ModEntityTypes.MIMIC.get()) {
-				// POLYMER WORKAROUND: Mimic uses INTERACTION hitbox + static chest BlockDisplay; see MimicPolymerEntity.
-				PolymerEntityUtils.registerType(entityType);
-				PolymerEntityUtils.registerOverlay((EntityType<MimicEntity>) entityType, MimicPolymerEntity::new);
-			} else {
-				// POLYMER WORKAROUND: Other Artifacts entities have no client mod; hide as vanilla armor stands on the wire.
-				PolymerEntityUtils.registerOverlay(entityType, entity -> context -> EntityType.ARMOR_STAND);
-			}
+			// POLYMER WORKAROUND: Artifacts entities have no client mod; hide as vanilla armor stands on the wire.
+			PolymerEntityUtils.registerOverlay(entityType, entity -> context -> EntityType.ARMOR_STAND);
 		} else if (registryKey.equals(Registries.SOUND_EVENT)) {
 			PolymerSoundEvent.registerOverlay((SoundEvent) value);
 		} else if (registryKey.equals(Registries.DATA_COMPONENT_TYPE)) {
