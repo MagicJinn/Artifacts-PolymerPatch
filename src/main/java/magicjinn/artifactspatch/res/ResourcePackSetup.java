@@ -10,6 +10,7 @@ import eu.pb4.polymer.resourcepack.extras.api.format.item.property.bool.BooleanP
 
 public final class ResourcePackSetup {
 	private static final String ARTIFACTS_ITEMS_PREFIX = "assets/artifacts/items/";
+	private static final String ARTIFACTS_HELD_MODELS_PREFIX = "assets/artifacts/models/item/";
 
 	private ResourcePackSetup() {
 	}
@@ -22,8 +23,33 @@ public final class ResourcePackSetup {
 				new ItemAsset(new BasicItemModel(id), new ItemAsset.Properties(false, false))
 		);
 		PolymerResourcePackUtils.RESOURCE_PACK_CREATION_EVENT.register(builder ->
-				builder.addResourceConverter(ResourcePackSetup::stripNeedsRepairItemModels)
+				builder.addResourceConverter(ResourcePackSetup::convertPackResource)
 		);
+	}
+
+	private static PackResource convertPackResource(String path, PackResource resource) {
+		resource = fixHeldModelParticleAtlas(path, resource);
+		resource = stripNeedsRepairItemModels(path, resource);
+		return resource;
+	}
+
+	// POLYMER WORKAROUND: oak_log particles pull the block atlas while canopy faces use item textures (Multiple atlases).
+	private static PackResource fixHeldModelParticleAtlas(String path, PackResource resource) {
+		if (!path.startsWith(ARTIFACTS_HELD_MODELS_PREFIX) || !path.endsWith(".json")) {
+			return resource;
+		}
+		String fileName = path.substring(ARTIFACTS_HELD_MODELS_PREFIX.length());
+		if (!HeldCuboidItemModels.HELD_MODEL_FILES_WITH_PARTICLE_FIX.contains(fileName)) {
+			return resource;
+		}
+		String content = resource.asString();
+		if (!content.contains("block/oak_log")) {
+			return resource;
+		}
+		return PackResource.fromString(content.replace(
+				"\"particle\": \"block/oak_log\"",
+				"\"particle\": \"artifacts:item/umbrella_held\""
+		));
 	}
 
 	// POLYMER WORKAROUND: Artifacts item models reference artifacts:needs_repair; rewrite to plain models for the Polymer pack.
@@ -36,7 +62,16 @@ public final class ResourcePackSetup {
 		}
 
 		String itemId = path.substring(ARTIFACTS_ITEMS_PREFIX.length(), path.length() - ".json".length());
-		String simplified = """
+		if (HeldCuboidItemModels.HELD_DISPLAY_CONTEXT_ITEMS.contains(itemId)
+				&& resource.asString().contains("minecraft:display_context")) {
+			return PackResource.fromString(heldDisplayContextItemModel(itemId));
+		}
+
+		return PackResource.fromString(flatIntactItemAsset(itemId));
+	}
+
+	private static String flatIntactItemAsset(String itemId) {
+		return """
 				{
 				  "model": {
 				    "type": "minecraft:model",
@@ -44,6 +79,54 @@ public final class ResourcePackSetup {
 				  }
 				}
 				""".formatted(itemId);
-		return PackResource.fromString(simplified);
+	}
+
+	/** GUI flat sprite + hand cuboid models; fallback uses the same intact flattening as other repairable items. */
+	private static String heldDisplayContextItemModel(String itemId) {
+		if (!HeldCuboidItemModels.UMBRELLA.equals(itemId)) {
+			return flatIntactItemAsset(itemId);
+		}
+		String guiFallback = flatIntactItemModelNode(itemId);
+		return """
+				{
+				  "model": {
+				    "type": "minecraft:select",
+				    "property": "minecraft:display_context",
+				    "cases": [
+				      {
+				        "when": [
+				          "firstperson_lefthand",
+				          "firstperson_righthand",
+				          "thirdperson_lefthand",
+				          "thirdperson_righthand",
+				          "head"
+				        ],
+				        "model": {
+				          "type": "minecraft:condition",
+				          "property": "minecraft:using_item",
+				          "on_false": {
+				            "type": "minecraft:model",
+				            "model": "artifacts:item/umbrella_held"
+				          },
+				          "on_true": {
+				            "type": "minecraft:model",
+				            "model": "artifacts:item/umbrella_held_blocking"
+				          }
+				        }
+				      }
+				    ],
+				    "fallback": %s
+				  }
+				}
+				""".formatted(guiFallback);
+	}
+
+	private static String flatIntactItemModelNode(String itemId) {
+		return """
+				{
+				  "type": "minecraft:model",
+				  "model": "artifacts:item/%s"
+				}
+				""".formatted(itemId);
 	}
 }

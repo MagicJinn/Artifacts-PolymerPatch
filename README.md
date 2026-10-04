@@ -36,7 +36,7 @@ Optional on the **server**: [Accessories](https://modrinth.com/mod/accessories),
 ## What this patch does
 
 - **Mixin** on Artifacts’ `FabricRegister` to register Polymer overlays when Artifacts registers content (items, entities, sounds, data components, attributes, etc.).
-- **Items (held / inventory)**: `PolyArtifactsItem` overlays with Artifacts `assets/artifacts/items` models bridged into the Polymer pack, including server-side `artifacts:needs_repair` item model property.
+- **Items (held / inventory)**: `PolyArtifactsItem` overlays with Artifacts `assets/artifacts/items` models bridged into the Polymer pack, including server-side `artifacts:needs_repair` item model property. Items with Artifacts cuboid `*_held` models (currently **umbrella**) keep flat GUI sprites and use the existing held JSON in hand via `minecraft:display_context` / `minecraft:using_item` in the generated pack.
 - **Networking**: skips Artifacts **clientbound** custom payloads when the client cannot receive them (avoids disconnects on vanilla clients).
 - **CCA**: limits `SwimDataComponent` sync to clients that can receive Artifacts swim packets.
 - **Digging claws (Polymer clients)**: server destroy-progress scaling so break time matches server `BLOCK_BREAK_SPEED` from Artifacts (vanilla clients still gate mining on local attributes).
@@ -53,7 +53,7 @@ Workarounds in source are tagged `POLYMER WORKAROUND:` (grep the repo). **Chorus
 | Area | Status |
 |------|--------|
 | Joining the server | **Works** with Polymer pack when networking/registries are patched |
-| Artifact items in inventory / hotbar | **Works** for item-model-based Artifacts (Polymer pack + `trial_key` wire type) |
+| Artifact items in inventory / hotbar | **Works** for item-model-based Artifacts (Polymer pack + `trial_key` wire type); **umbrella** uses 3D held models in hand |
 | Trinket slot UI (equip screen) | **[Trinkets Polymer](https://modrinth.com/mod/trinkets-polymer)** on the server; vanilla clients install nothing |
 | Worn Artifacts on player body | **Not shown** (Artifacts client 3D meshes only; Polymer virtual item displays were removed as unstable) |
 | Artifact abilities / combat | **Server-side**; should function; client-only feedback may be missing |
