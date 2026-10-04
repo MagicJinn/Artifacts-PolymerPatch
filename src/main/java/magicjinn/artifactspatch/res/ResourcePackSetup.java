@@ -15,6 +15,7 @@ public final class ResourcePackSetup {
 	private static final String HELD_ITEM_TEXTURE = "artifacts:item/" + HeldCuboidItemModels.HELD_TEXTURE_PATH;
 	private static final String HELD_ITEM_TEXTURE_PATH =
 			"assets/artifacts/textures/item/" + HeldCuboidItemModels.HELD_TEXTURE_PATH + ".png";
+	private static final String HELD_CUBOID_TEXTURE_REF = HeldCuboidItemModels.HELD_CUBOID_TEXTURE_REF;
 
 	private ResourcePackSetup() {
 	}
@@ -71,10 +72,11 @@ public final class ResourcePackSetup {
 		if (!HeldCuboidItemModels.HELD_CUBOID_MODEL_FILES.contains(fileName)) {
 			return resource;
 		}
-		String cuboidTexture = HeldCuboidItemModels.HELD_CUBOID_TEXTURE;
 		String content = resource.asString();
-		content = content.replace("\"particle\": \"block/oak_log\"", "\"particle\": \"" + cuboidTexture + "\"");
-		content = content.replace(HELD_ITEM_TEXTURE, cuboidTexture);
+		content = content.replace("\"particle\": \"block/oak_log\"", "\"particle\": \"" + HELD_CUBOID_TEXTURE_REF + "\"");
+		content = content.replace(HELD_ITEM_TEXTURE, HELD_CUBOID_TEXTURE_REF);
+		content = content.replace("artifacts:block/" + HeldCuboidItemModels.HELD_TEXTURE_PATH, HELD_CUBOID_TEXTURE_REF);
+		content = content.replace("minecraft:block/artifacts_" + HeldCuboidItemModels.HELD_TEXTURE_PATH, HELD_CUBOID_TEXTURE_REF);
 		return PackResource.fromString(content);
 	}
 

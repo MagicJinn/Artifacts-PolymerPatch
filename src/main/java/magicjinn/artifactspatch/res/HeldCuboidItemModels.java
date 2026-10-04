@@ -19,11 +19,11 @@ public final class HeldCuboidItemModels {
 
 	public static final String HELD_TEXTURE_PATH = "umbrella_held";
 
-	/** Block-atlas sprite for held cuboid faces (not a model id). */
-	public static final String HELD_CUBOID_TEXTURE = "minecraft:block/artifacts_umbrella_held";
+	/** Relative block-atlas texture ref in {@code models/item/*_held.json} (same form as {@code block/oak_log}). */
+	public static final String HELD_CUBOID_TEXTURE_REF = "block/" + HELD_TEXTURE_PATH;
 
 	public static final String HELD_CUBOID_TEXTURE_ASSET_PATH =
-			"assets/minecraft/textures/block/artifacts_umbrella_held.png";
+			"assets/artifacts/textures/block/" + HELD_TEXTURE_PATH + ".png";
 
 	private HeldCuboidItemModels() {
 	}
