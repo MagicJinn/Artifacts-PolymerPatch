@@ -10,6 +10,7 @@ import eu.pb4.polymer.resourcepack.extras.api.format.item.property.bool.BooleanP
 
 public final class ResourcePackSetup {
 	private static final String ARTIFACTS_ITEMS_PREFIX = "assets/artifacts/items/";
+	private static final String ARTIFACTS_BRIDGED_ITEMS_PREFIX = "assets/artifacts/items/-/item/";
 	private static final String ARTIFACTS_HELD_MODELS_PREFIX = "assets/artifacts/models/item/";
 
 	private ResourcePackSetup() {
@@ -29,8 +30,21 @@ public final class ResourcePackSetup {
 
 	private static PackResource convertPackResource(String path, PackResource resource) {
 		resource = fixHeldModelParticleAtlas(path, resource);
+		resource = patchHeldDisplayContextItemAssets(path, resource);
 		resource = stripNeedsRepairItemModels(path, resource);
 		return resource;
+	}
+
+	/** Polymer also emits bridged {@code items/-/item/<id>.json} from {@code models/item/}; keep it in sync with {@code items/<id>.json}. */
+	private static PackResource patchHeldDisplayContextItemAssets(String path, PackResource resource) {
+		if (!path.startsWith(ARTIFACTS_BRIDGED_ITEMS_PREFIX) || !path.endsWith(".json")) {
+			return resource;
+		}
+		String itemId = path.substring(ARTIFACTS_BRIDGED_ITEMS_PREFIX.length(), path.length() - ".json".length());
+		if (!HeldCuboidItemModels.HELD_DISPLAY_CONTEXT_ITEMS.contains(itemId)) {
+			return resource;
+		}
+		return PackResource.fromString(heldDisplayContextItemModel(itemId));
 	}
 
 	// POLYMER WORKAROUND: oak_log particles pull the block atlas while canopy faces use item textures (Multiple atlases).

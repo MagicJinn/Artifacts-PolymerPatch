@@ -3,6 +3,7 @@ package magicjinn.artifactspatch.poly;
 import artifacts.Artifacts;
 import eu.pb4.polymer.core.api.item.VanillaModeledPolymerItem;
 import eu.pb4.polymer.resourcepack.extras.api.ResourcePackExtras;
+import magicjinn.artifactspatch.res.HeldCuboidItemModels;
 import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.HolderLookup;
@@ -53,7 +54,13 @@ public record PolyArtifactsItem(Item item) implements VanillaModeledPolymerItem 
 	@Override
 	public Identifier getPolymerItemModel(ItemStack stack, PacketContext context, HolderLookup.Provider lookup) {
 		var path = BuiltInRegistries.ITEM.getKey(item).getPath();
-		return ResourcePackExtras.bridgeModel(Artifacts.id("item/" + path));
+		var modelId = Artifacts.id("item/" + path);
+		// POLYMER WORKAROUND: bridgeModel points at assets/.../items/-/item/<id>.json (BasicItemModel from models/item),
+		// which is only the flat generated icon. Hand display_context lives in assets/artifacts/items/<id>.json.
+		if (HeldCuboidItemModels.HELD_DISPLAY_CONTEXT_ITEMS.contains(path)) {
+			return modelId;
+		}
+		return ResourcePackExtras.bridgeModel(modelId);
 	}
 
 	// POLYMER WORKAROUND: Trinkets Polymer is a server dependency; vanilla clients cannot install Trinkets, so
