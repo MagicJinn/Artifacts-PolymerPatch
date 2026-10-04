@@ -12,6 +12,12 @@ public final class ResourcePackSetup {
 	private static final String ARTIFACTS_ITEMS_PREFIX = "assets/artifacts/items/";
 	private static final String ARTIFACTS_BRIDGED_ITEMS_PREFIX = "assets/artifacts/items/-/item/";
 	private static final String ARTIFACTS_HELD_MODELS_PREFIX = "assets/artifacts/models/item/";
+	private static final String HELD_ITEM_TEXTURE = "artifacts:item/" + HeldCuboidItemModels.HELD_TEXTURE_PATH;
+	private static final String HELD_BLOCK_TEXTURE = "artifacts:block/" + HeldCuboidItemModels.HELD_TEXTURE_PATH;
+	private static final String HELD_ITEM_TEXTURE_PATH =
+			"assets/artifacts/textures/item/" + HeldCuboidItemModels.HELD_TEXTURE_PATH + ".png";
+	private static final String HELD_BLOCK_TEXTURE_PATH =
+			"assets/artifacts/textures/block/" + HeldCuboidItemModels.HELD_TEXTURE_PATH + ".png";
 
 	private ResourcePackSetup() {
 	}
@@ -23,13 +29,25 @@ public final class ResourcePackSetup {
 		ResourcePackExtras.forDefault().addBridgedModelsFolder(Artifacts.id("item"), (id, builder) ->
 				new ItemAsset(new BasicItemModel(id), new ItemAsset.Properties(false, false))
 		);
-		PolymerResourcePackUtils.RESOURCE_PACK_CREATION_EVENT.register(builder ->
-				builder.addResourceConverter(ResourcePackSetup::convertPackResource)
-		);
+		PolymerResourcePackUtils.RESOURCE_PACK_CREATION_EVENT.register(builder -> {
+			builder.addResourceConverter(ResourcePackSetup::convertPackResource);
+			// POLYMER WORKAROUND: CuboidItemModelWrapper only stitches block-atlas sprites; copy held PNG for block refs.
+			builder.addPreFinishTask(ResourcePackSetup::copyHeldTextureToBlockAtlas);
+		});
+	}
+
+	private static void copyHeldTextureToBlockAtlas(eu.pb4.polymer.resourcepack.api.ResourcePackBuilder builder) {
+		if (builder.getData(HELD_BLOCK_TEXTURE_PATH) != null) {
+			return;
+		}
+		byte[] itemTexture = builder.getData(HELD_ITEM_TEXTURE_PATH);
+		if (itemTexture != null) {
+			builder.addData(HELD_BLOCK_TEXTURE_PATH, itemTexture);
+		}
 	}
 
 	private static PackResource convertPackResource(String path, PackResource resource) {
-		resource = fixHeldModelParticleAtlas(path, resource);
+		resource = fixHeldCuboidModelTextures(path, resource);
 		resource = patchHeldDisplayContextItemAssets(path, resource);
 		resource = stripNeedsRepairItemModels(path, resource);
 		return resource;
@@ -47,23 +65,19 @@ public final class ResourcePackSetup {
 		return PackResource.fromString(heldDisplayContextItemModel(itemId));
 	}
 
-	// POLYMER WORKAROUND: oak_log particles pull the block atlas while canopy faces use item textures (Multiple atlases).
-	private static PackResource fixHeldModelParticleAtlas(String path, PackResource resource) {
+	// POLYMER WORKAROUND: minecraft:model cuboids bake via block ModelBaker (blocks atlas only); Artifacts uses item/ textures.
+	private static PackResource fixHeldCuboidModelTextures(String path, PackResource resource) {
 		if (!path.startsWith(ARTIFACTS_HELD_MODELS_PREFIX) || !path.endsWith(".json")) {
 			return resource;
 		}
 		String fileName = path.substring(ARTIFACTS_HELD_MODELS_PREFIX.length());
-		if (!HeldCuboidItemModels.HELD_MODEL_FILES_WITH_PARTICLE_FIX.contains(fileName)) {
+		if (!HeldCuboidItemModels.HELD_CUBOID_MODEL_FILES.contains(fileName)) {
 			return resource;
 		}
 		String content = resource.asString();
-		if (!content.contains("block/oak_log")) {
-			return resource;
-		}
-		return PackResource.fromString(content.replace(
-				"\"particle\": \"block/oak_log\"",
-				"\"particle\": \"artifacts:item/umbrella_held\""
-		));
+		content = content.replace("\"particle\": \"block/oak_log\"", "\"particle\": \"" + HELD_BLOCK_TEXTURE + "\"");
+		content = content.replace(HELD_ITEM_TEXTURE, HELD_BLOCK_TEXTURE);
+		return PackResource.fromString(content);
 	}
 
 	// POLYMER WORKAROUND: Artifacts item models reference artifacts:needs_repair; rewrite to plain models for the Polymer pack.

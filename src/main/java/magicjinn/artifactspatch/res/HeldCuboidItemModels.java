@@ -11,10 +11,13 @@ public final class HeldCuboidItemModels {
 	/** Item ids whose {@code items/*.json} need hand display_context wiring in the Polymer pack. */
 	public static final Set<String> HELD_DISPLAY_CONTEXT_ITEMS = Set.of(UMBRELLA);
 
-	/** {@code models/item/*.json} files that need single-atlas particle fixes in the generated pack. */
-	public static final Set<String> HELD_MODEL_FILES_WITH_PARTICLE_FIX = Set.of(
-			"umbrella_held.json"
+	/** Cuboid held models baked through {@code CuboidItemModelWrapper} (blocks atlas only). */
+	public static final Set<String> HELD_CUBOID_MODEL_FILES = Set.of(
+			"umbrella_held.json",
+			"umbrella_held_blocking.json"
 	);
+
+	public static final String HELD_TEXTURE_PATH = "umbrella_held";
 
 	private HeldCuboidItemModels() {
 	}
