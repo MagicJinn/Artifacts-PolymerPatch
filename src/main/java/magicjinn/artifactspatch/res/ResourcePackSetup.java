@@ -13,9 +13,6 @@ public final class ResourcePackSetup {
 	private static final String ARTIFACTS_BRIDGED_ITEMS_PREFIX = "assets/artifacts/items/-/item/";
 	private static final String ARTIFACTS_HELD_MODELS_PREFIX = "assets/artifacts/models/item/";
 	private static final String HELD_ITEM_TEXTURE = "artifacts:item/" + HeldCuboidItemModels.HELD_TEXTURE_PATH;
-	private static final String HELD_ITEM_TEXTURE_PATH =
-			"assets/artifacts/textures/item/" + HeldCuboidItemModels.HELD_TEXTURE_PATH + ".png";
-	private static final String HELD_CUBOID_TEXTURE_REF = HeldCuboidItemModels.HELD_CUBOID_TEXTURE_REF;
 
 	private ResourcePackSetup() {
 	}
@@ -27,21 +24,9 @@ public final class ResourcePackSetup {
 		ResourcePackExtras.forDefault().addBridgedModelsFolder(Artifacts.id("item"), (id, builder) ->
 				new ItemAsset(new BasicItemModel(id), new ItemAsset.Properties(false, false))
 		);
-		PolymerResourcePackUtils.RESOURCE_PACK_CREATION_EVENT.register(builder -> {
-			builder.addResourceConverter(ResourcePackSetup::convertPackResource);
-			// POLYMER WORKAROUND: CuboidItemModelWrapper only stitches block-atlas sprites; copy held PNG for block refs.
-			builder.addPreFinishTask(ResourcePackSetup::copyHeldTextureToBlockAtlas);
-		});
-	}
-
-	private static void copyHeldTextureToBlockAtlas(eu.pb4.polymer.resourcepack.api.ResourcePackBuilder builder) {
-		if (builder.getData(HeldCuboidItemModels.HELD_CUBOID_TEXTURE_ASSET_PATH) != null) {
-			return;
-		}
-		byte[] itemTexture = builder.getData(HELD_ITEM_TEXTURE_PATH);
-		if (itemTexture != null) {
-			builder.addData(HeldCuboidItemModels.HELD_CUBOID_TEXTURE_ASSET_PATH, itemTexture);
-		}
+		PolymerResourcePackUtils.RESOURCE_PACK_CREATION_EVENT.register(builder ->
+				builder.addResourceConverter(ResourcePackSetup::convertPackResource)
+		);
 	}
 
 	private static PackResource convertPackResource(String path, PackResource resource) {
@@ -63,7 +48,7 @@ public final class ResourcePackSetup {
 		return PackResource.fromString(heldDisplayContextItemModel(itemId));
 	}
 
-	// POLYMER WORKAROUND: minecraft:model cuboids bake via block ModelBaker (blocks atlas only); Artifacts uses item/ textures.
+	// POLYMER WORKAROUND: held cuboids sample the items atlas; drop block/oak_log particle (mixed atlases).
 	private static PackResource fixHeldCuboidModelTextures(String path, PackResource resource) {
 		if (!path.startsWith(ARTIFACTS_HELD_MODELS_PREFIX) || !path.endsWith(".json")) {
 			return resource;
@@ -73,12 +58,17 @@ public final class ResourcePackSetup {
 			return resource;
 		}
 		String content = resource.asString();
-		String ref = HELD_CUBOID_TEXTURE_REF;
-		content = content.replace("\"particle\": \"block/oak_log\"", "\"particle\": \"" + ref + "\"");
-		content = content.replace("\"particle\": \"block/" + HeldCuboidItemModels.HELD_TEXTURE_PATH + "\"", "\"particle\": \"" + ref + "\"");
-		content = content.replace("\"particle\": \"minecraft:block/artifacts_" + HeldCuboidItemModels.HELD_TEXTURE_PATH + "\"", "\"particle\": \"" + ref + "\"");
-		content = content.replace("\"umbrella\": \"" + HELD_ITEM_TEXTURE + "\"", "\"umbrella\": \"" + ref + "\"");
-		content = content.replace("\"umbrella\": \"block/" + HeldCuboidItemModels.HELD_TEXTURE_PATH + "\"", "\"umbrella\": \"" + ref + "\"");
+		String itemTexture = HELD_ITEM_TEXTURE;
+		String held = HeldCuboidItemModels.HELD_TEXTURE_PATH;
+		content = content.replace("\"particle\": \"block/oak_log\"", "\"particle\": \"" + itemTexture + "\"");
+		content = content.replace("\"particle\": \"block/" + held + "\"", "\"particle\": \"" + itemTexture + "\"");
+		content = content.replace("\"particle\": \"artifacts:block/" + held + "\"", "\"particle\": \"" + itemTexture + "\"");
+		content = content.replace(
+				"\"particle\": \"minecraft:block/artifacts_" + held + "\"",
+				"\"particle\": \"" + itemTexture + "\""
+		);
+		content = content.replace("\"umbrella\": \"artifacts:block/" + held + "\"", "\"umbrella\": \"" + itemTexture + "\"");
+		content = content.replace("\"umbrella\": \"block/" + held + "\"", "\"umbrella\": \"" + itemTexture + "\"");
 		return PackResource.fromString(content);
 	}
 
