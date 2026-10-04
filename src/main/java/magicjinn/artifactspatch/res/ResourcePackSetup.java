@@ -13,11 +13,8 @@ public final class ResourcePackSetup {
 	private static final String ARTIFACTS_BRIDGED_ITEMS_PREFIX = "assets/artifacts/items/-/item/";
 	private static final String ARTIFACTS_HELD_MODELS_PREFIX = "assets/artifacts/models/item/";
 	private static final String HELD_ITEM_TEXTURE = "artifacts:item/" + HeldCuboidItemModels.HELD_TEXTURE_PATH;
-	private static final String HELD_BLOCK_TEXTURE = "artifacts:block/" + HeldCuboidItemModels.HELD_TEXTURE_PATH;
 	private static final String HELD_ITEM_TEXTURE_PATH =
 			"assets/artifacts/textures/item/" + HeldCuboidItemModels.HELD_TEXTURE_PATH + ".png";
-	private static final String HELD_BLOCK_TEXTURE_PATH =
-			"assets/artifacts/textures/block/" + HeldCuboidItemModels.HELD_TEXTURE_PATH + ".png";
 
 	private ResourcePackSetup() {
 	}
@@ -37,12 +34,12 @@ public final class ResourcePackSetup {
 	}
 
 	private static void copyHeldTextureToBlockAtlas(eu.pb4.polymer.resourcepack.api.ResourcePackBuilder builder) {
-		if (builder.getData(HELD_BLOCK_TEXTURE_PATH) != null) {
+		if (builder.getData(HeldCuboidItemModels.HELD_CUBOID_TEXTURE_ASSET_PATH) != null) {
 			return;
 		}
 		byte[] itemTexture = builder.getData(HELD_ITEM_TEXTURE_PATH);
 		if (itemTexture != null) {
-			builder.addData(HELD_BLOCK_TEXTURE_PATH, itemTexture);
+			builder.addData(HeldCuboidItemModels.HELD_CUBOID_TEXTURE_ASSET_PATH, itemTexture);
 		}
 	}
 
@@ -74,9 +71,10 @@ public final class ResourcePackSetup {
 		if (!HeldCuboidItemModels.HELD_CUBOID_MODEL_FILES.contains(fileName)) {
 			return resource;
 		}
+		String cuboidTexture = HeldCuboidItemModels.HELD_CUBOID_TEXTURE;
 		String content = resource.asString();
-		content = content.replace("\"particle\": \"block/oak_log\"", "\"particle\": \"" + HELD_BLOCK_TEXTURE + "\"");
-		content = content.replace(HELD_ITEM_TEXTURE, HELD_BLOCK_TEXTURE);
+		content = content.replace("\"particle\": \"block/oak_log\"", "\"particle\": \"" + cuboidTexture + "\"");
+		content = content.replace(HELD_ITEM_TEXTURE, cuboidTexture);
 		return PackResource.fromString(content);
 	}
 
