@@ -73,10 +73,12 @@ public final class ResourcePackSetup {
 			return resource;
 		}
 		String content = resource.asString();
-		content = content.replace("\"particle\": \"block/oak_log\"", "\"particle\": \"" + HELD_CUBOID_TEXTURE_REF + "\"");
-		content = content.replace(HELD_ITEM_TEXTURE, HELD_CUBOID_TEXTURE_REF);
-		content = content.replace("artifacts:block/" + HeldCuboidItemModels.HELD_TEXTURE_PATH, HELD_CUBOID_TEXTURE_REF);
-		content = content.replace("minecraft:block/artifacts_" + HeldCuboidItemModels.HELD_TEXTURE_PATH, HELD_CUBOID_TEXTURE_REF);
+		String ref = HELD_CUBOID_TEXTURE_REF;
+		content = content.replace("\"particle\": \"block/oak_log\"", "\"particle\": \"" + ref + "\"");
+		content = content.replace("\"particle\": \"block/" + HeldCuboidItemModels.HELD_TEXTURE_PATH + "\"", "\"particle\": \"" + ref + "\"");
+		content = content.replace("\"particle\": \"minecraft:block/artifacts_" + HeldCuboidItemModels.HELD_TEXTURE_PATH + "\"", "\"particle\": \"" + ref + "\"");
+		content = content.replace("\"umbrella\": \"" + HELD_ITEM_TEXTURE + "\"", "\"umbrella\": \"" + ref + "\"");
+		content = content.replace("\"umbrella\": \"block/" + HeldCuboidItemModels.HELD_TEXTURE_PATH + "\"", "\"umbrella\": \"" + ref + "\"");
 		return PackResource.fromString(content);
 	}
 

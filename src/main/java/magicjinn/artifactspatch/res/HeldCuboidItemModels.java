@@ -19,8 +19,8 @@ public final class HeldCuboidItemModels {
 
 	public static final String HELD_TEXTURE_PATH = "umbrella_held";
 
-	/** Relative block-atlas texture ref in {@code models/item/*_held.json} (same form as {@code block/oak_log}). */
-	public static final String HELD_CUBOID_TEXTURE_REF = "block/" + HELD_TEXTURE_PATH;
+	/** Namespaced blocks-atlas sprite for cuboid {@code textures} (matches {@link #HELD_CUBOID_TEXTURE_ASSET_PATH}). */
+	public static final String HELD_CUBOID_TEXTURE_REF = "artifacts:block/" + HELD_TEXTURE_PATH;
 
 	public static final String HELD_CUBOID_TEXTURE_ASSET_PATH =
 			"assets/artifacts/textures/block/" + HELD_TEXTURE_PATH + ".png";
