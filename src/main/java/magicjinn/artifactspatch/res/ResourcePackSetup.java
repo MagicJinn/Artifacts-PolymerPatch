@@ -4,6 +4,7 @@ import artifacts.Artifacts;
 import eu.pb4.polymer.resourcepack.api.PackResource;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import eu.pb4.polymer.resourcepack.extras.api.ResourcePackExtras;
+import eu.pb4.polymer.resourcepack.extras.api.format.atlas.AtlasAsset;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.ItemAsset;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.model.BasicItemModel;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.property.bool.BooleanProperty;
@@ -12,7 +13,8 @@ public final class ResourcePackSetup {
 	private static final String ARTIFACTS_ITEMS_PREFIX = "assets/artifacts/items/";
 	private static final String ARTIFACTS_BRIDGED_ITEMS_PREFIX = "assets/artifacts/items/-/item/";
 	private static final String ARTIFACTS_HELD_MODELS_PREFIX = "assets/artifacts/models/item/";
-	private static final String HELD_ITEM_TEXTURE = "artifacts:item/" + HeldCuboidItemModels.HELD_TEXTURE_PATH;
+	private static final String HELD_ITEM_TEXTURE = HeldCuboidItemModels.HELD_ITEM_ATLAS_SPRITE;
+	private static final String MINECRAFT_BLOCKS_ATLAS_PATH = "assets/minecraft/atlases/blocks.json";
 
 	private ResourcePackSetup() {
 	}
@@ -33,7 +35,26 @@ public final class ResourcePackSetup {
 		resource = fixHeldCuboidModelTextures(path, resource);
 		resource = patchHeldDisplayContextItemAssets(path, resource);
 		resource = stripNeedsRepairItemModels(path, resource);
+		resource = mergeHeldSpriteIntoBlocksAtlas(path, resource);
 		return resource;
+	}
+
+	// POLYMER WORKAROUND: CuboidItemModelWrapper bakes on the blocks atlas; append a single source via Polymer AtlasAsset API.
+	private static PackResource mergeHeldSpriteIntoBlocksAtlas(String path, PackResource resource) {
+		if (!MINECRAFT_BLOCKS_ATLAS_PATH.equals(path)) {
+			return resource;
+		}
+		String json = resource.asString();
+		if (json.contains(HELD_ITEM_TEXTURE)) {
+			return resource;
+		}
+		AtlasAsset atlas = AtlasAsset.fromJson(json);
+		var merged = AtlasAsset.builder();
+		for (var source : atlas.sources()) {
+			merged.add(source);
+		}
+		merged.single(Artifacts.id("item/" + HeldCuboidItemModels.HELD_TEXTURE_PATH));
+		return PackResource.fromString(merged.build().toJson());
 	}
 
 	/** Polymer also emits bridged {@code items/-/item/<id>.json} from {@code models/item/}; keep it in sync with {@code items/<id>.json}. */
@@ -48,7 +69,7 @@ public final class ResourcePackSetup {
 		return PackResource.fromString(heldDisplayContextItemModel(itemId));
 	}
 
-	// POLYMER WORKAROUND: held cuboids sample the items atlas; drop block/oak_log particle (mixed atlases).
+	// POLYMER WORKAROUND: single-atlas item sprites for cuboid faces; drop block/oak_log particle (mixed atlases).
 	private static PackResource fixHeldCuboidModelTextures(String path, PackResource resource) {
 		if (!path.startsWith(ARTIFACTS_HELD_MODELS_PREFIX) || !path.endsWith(".json")) {
 			return resource;

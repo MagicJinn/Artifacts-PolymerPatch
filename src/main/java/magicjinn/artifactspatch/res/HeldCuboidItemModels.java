@@ -19,6 +19,9 @@ public final class HeldCuboidItemModels {
 
 	public static final String HELD_TEXTURE_PATH = "umbrella_held";
 
+	/** Sprite id for held cuboid faces; stitched onto the blocks atlas for {@code CuboidItemModelWrapper}. */
+	public static final String HELD_ITEM_ATLAS_SPRITE = "artifacts:item/" + HELD_TEXTURE_PATH;
+
 	private HeldCuboidItemModels() {
 	}
 }
