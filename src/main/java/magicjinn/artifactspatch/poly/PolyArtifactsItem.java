@@ -60,7 +60,7 @@ public record PolyArtifactsItem(Item item) implements VanillaModeledPolymerItem 
 		var path = BuiltInRegistries.ITEM.getKey(item).getPath();
 		// POLYMER WORKAROUND: Hand display_context lives in assets/artifacts/items/<id>.json (item model id artifacts:<id>).
 		// bridgeModel(artifacts:item/<id>) is artifacts:-/item/<id> (flat BasicItemModel from models/item only).
-		if (HeldCuboidItemModels.HELD_DISPLAY_CONTEXT_ITEMS.contains(path)) {
+		if (HeldCuboidItemModels.UMBRELLA.equals(path)) {
 			return Artifacts.id(path);
 		}
 		return ResourcePackExtras.bridgeModel(Artifacts.id("item/" + path));

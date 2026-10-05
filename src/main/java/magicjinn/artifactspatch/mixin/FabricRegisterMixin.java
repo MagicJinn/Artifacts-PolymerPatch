@@ -1,11 +1,13 @@
 package magicjinn.artifactspatch.mixin;
 
 import artifacts.Artifacts;
+import artifacts.entity.MimicEntity;
 import artifacts.fabric.registry.FabricRegister;
 import artifacts.registry.Register;
 import artifacts.registry.RegistryHolder;
 import eu.pb4.polymer.rsm.api.RegistrySyncUtils;
 import magicjinn.artifactspatch.poly.PolyArtifactsItem;
+import magicjinn.artifactspatch.poly.PolyMimicEntity;
 import eu.pb4.polymer.core.api.entity.PolymerEntityUtils;
 import eu.pb4.polymer.core.api.item.PolymerCreativeModeTabUtils;
 import eu.pb4.polymer.core.api.item.PolymerItem;
@@ -52,8 +54,14 @@ public abstract class FabricRegisterMixin<R> {
 		} else if (registryKey.equals(Registries.ENTITY_TYPE)) {
 			@SuppressWarnings("unchecked")
 			EntityType<?> entityType = (EntityType<?>) value;
-			// POLYMER WORKAROUND: Artifacts entities have no client mod; hide as vanilla armor stands on the wire.
-			PolymerEntityUtils.registerOverlay(entityType, entity -> context -> EntityType.ARMOR_STAND);
+			// POLYMER WORKAROUND: Artifacts entities have no client mod. Mimic uses chest/spawn-egg item displays;
+			// other entities (if any) stay as invisible-capable armor stands on the wire.
+			PolymerEntityUtils.registerOverlay(entityType, entity -> {
+				if (entity instanceof MimicEntity mimic) {
+					return new PolyMimicEntity(mimic);
+				}
+				return context -> EntityType.ARMOR_STAND;
+			});
 		} else if (registryKey.equals(Registries.SOUND_EVENT)) {
 			PolymerSoundEvent.registerOverlay((SoundEvent) value);
 		} else if (registryKey.equals(Registries.DATA_COMPONENT_TYPE)) {

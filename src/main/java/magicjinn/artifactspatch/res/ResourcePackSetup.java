@@ -10,9 +10,7 @@ import eu.pb4.polymer.resourcepack.extras.api.format.item.property.bool.BooleanP
 
 public final class ResourcePackSetup {
 	private static final String ARTIFACTS_ITEMS_PREFIX = "assets/artifacts/items/";
-	private static final String ARTIFACTS_BRIDGED_ITEMS_PREFIX = "assets/artifacts/items/-/item/";
 	private static final String ARTIFACTS_HELD_MODELS_PREFIX = "assets/artifacts/models/item/";
-	private static final String HELD_ITEM_TEXTURE = HeldCuboidItemModels.HELD_ITEM_ATLAS_SPRITE;
 
 	private ResourcePackSetup() {
 	}
@@ -32,16 +30,15 @@ public final class ResourcePackSetup {
 	private static PackResource convertPackResource(String path, PackResource resource) {
 		resource = fixHeldCuboidModelTextures(path, resource);
 		resource = patchUmbrellaHeldDisplays(path, resource);
-		resource = patchHeldDisplayContextItemAssets(path, resource);
 		resource = stripNeedsRepairItemModels(path, resource);
 		return resource;
 	}
 
 	/**
-	 * POLYMER WORKAROUND: Artifacts' SpearAnimationsMixin forces idle spear xRot to -π/4 (upright) and eases
-	 * attack; vanilla spear pose leans ~45° into the face. Tip the held model back and mirror on X so the
-	 * attack arc matches Artifacts' horizontal direction. FP blocking is patched separately; TP blocking
-	 * stays on umbrella_held_blocking unchanged.
+	 * POLYMER WORKAROUND: Artifacts' SpearAnimationsMixin uprights idle spear xRot and eases attack; vanilla spear
+	 * pose leans into the face. Tip the held model back, raise it, and yaw 180 for the attack arc (negative X scale
+	 * also mirrors but inverts face normals so the canopy shades darker than the underside). FP blocking needs its
+	 * own rotation because Artifacts cancels first-person BLOCK arm anim and vanilla does not.
 	 */
 	private static PackResource patchUmbrellaHeldDisplays(String path, PackResource resource) {
 		if (!path.startsWith(ARTIFACTS_HELD_MODELS_PREFIX) || !path.endsWith(".json")) {
@@ -50,59 +47,32 @@ public final class ResourcePackSetup {
 		String fileName = path.substring(ARTIFACTS_HELD_MODELS_PREFIX.length());
 		String content = resource.asString();
 		if ("umbrella_held.json".equals(fileName)) {
-			// Stock thirdperson is [0,0,0] + [0,0,2]; spear arm alone leaves a ~45° forward lean.
-			// +45 tips back upright; -45 was forward again. Raise Y so the canopy clears the head.
 			content = content.replace(
 					"\"thirdperson_righthand\": {\n      \"rotation\": [0, 0, 0],\n      \"translation\": [0, 0, 2]\n    }",
-					"\"thirdperson_righthand\": {\n      \"rotation\": [45, 0, 0],\n      \"translation\": [0, 8, 2],\n      \"scale\": [-1, 1, 1]\n    }"
+					"\"thirdperson_righthand\": {\n      \"rotation\": [45, 180, 0],\n      \"translation\": [0, 8, 2]\n    }"
 			);
 			content = content.replace(
 					"\"thirdperson_lefthand\": {\n      \"rotation\": [0, 0, 0],\n      \"translation\": [0, 0, 2]\n    }",
-					"\"thirdperson_lefthand\": {\n      \"rotation\": [45, 0, 0],\n      \"translation\": [0, 8, 2],\n      \"scale\": [-1, 1, 1]\n    }"
+					"\"thirdperson_lefthand\": {\n      \"rotation\": [45, 180, 0],\n      \"translation\": [0, 8, 2]\n    }"
 			);
 			return PackResource.fromString(content);
 		}
 		if ("umbrella_held_blocking.json".equals(fileName)) {
-			// Only firstperson uses [-90, 22.5, 0]; thirdperson stays [-45, 0, -15].
 			content = content.replace("\"rotation\": [-90, 22.5, 0]", "\"rotation\": [90, 22.5, -90]");
 			return PackResource.fromString(content);
 		}
 		return resource;
 	}
 
-	/** Polymer also emits bridged {@code items/-/item/<id>.json} from {@code models/item/}; keep it in sync with {@code items/<id>.json}. */
-	private static PackResource patchHeldDisplayContextItemAssets(String path, PackResource resource) {
-		if (!path.startsWith(ARTIFACTS_BRIDGED_ITEMS_PREFIX) || !path.endsWith(".json")) {
-			return resource;
-		}
-		String itemId = path.substring(ARTIFACTS_BRIDGED_ITEMS_PREFIX.length(), path.length() - ".json".length());
-		if (!HeldCuboidItemModels.HELD_DISPLAY_CONTEXT_ITEMS.contains(itemId)) {
-			return resource;
-		}
-		return PackResource.fromString(heldDisplayContextItemModel(itemId));
-	}
-
-	// POLYMER WORKAROUND: single-atlas item sprites for cuboid faces; drop block/oak_log particle (mixed atlases).
+	// POLYMER WORKAROUND: held cuboid particle is block/oak_log (blocks atlas); faces already use items-atlas umbrella_held.
 	private static PackResource fixHeldCuboidModelTextures(String path, PackResource resource) {
-		if (!path.startsWith(ARTIFACTS_HELD_MODELS_PREFIX) || !path.endsWith(".json")) {
+		if (!path.equals(ARTIFACTS_HELD_MODELS_PREFIX + HeldCuboidItemModels.HELD_TEXTURE_MODEL)) {
 			return resource;
 		}
-		String fileName = path.substring(ARTIFACTS_HELD_MODELS_PREFIX.length());
-		if (!HeldCuboidItemModels.HELD_CUBOID_MODEL_FILES.contains(fileName)) {
-			return resource;
-		}
-		String content = resource.asString();
-		String itemTexture = HELD_ITEM_TEXTURE;
-		String held = HeldCuboidItemModels.HELD_TEXTURE_PATH;
-		content = content.replace("\"particle\": \"block/oak_log\"", "\"particle\": \"" + itemTexture + "\"");
-		content = content.replace("\"particle\": \"block/" + held + "\"", "\"particle\": \"" + itemTexture + "\"");
-		content = content.replace("\"particle\": \"artifacts:block/" + held + "\"", "\"particle\": \"" + itemTexture + "\"");
-		content = content.replace(
-				"\"particle\": \"minecraft:block/artifacts_" + held + "\"",
-				"\"particle\": \"" + itemTexture + "\""
+		String content = resource.asString().replace(
+				"\"particle\": \"block/oak_log\"",
+				"\"particle\": \"" + HeldCuboidItemModels.HELD_ITEM_ATLAS_SPRITE + "\""
 		);
-		content = content.replace("\"umbrella\": \"artifacts:block/" + held + "\"", "\"umbrella\": \"" + itemTexture + "\"");
-		content = content.replace("\"umbrella\": \"block/" + held + "\"", "\"umbrella\": \"" + itemTexture + "\"");
 		return PackResource.fromString(content);
 	}
 
@@ -116,9 +86,8 @@ public final class ResourcePackSetup {
 		}
 
 		String itemId = path.substring(ARTIFACTS_ITEMS_PREFIX.length(), path.length() - ".json".length());
-		if (HeldCuboidItemModels.HELD_DISPLAY_CONTEXT_ITEMS.contains(itemId)
-				&& resource.asString().contains("minecraft:display_context")) {
-			return PackResource.fromString(heldDisplayContextItemModel(itemId));
+		if (HeldCuboidItemModels.UMBRELLA.equals(itemId)) {
+			return PackResource.fromString(umbrellaDisplayContextItemModel());
 		}
 
 		return PackResource.fromString(flatIntactItemAsset(itemId));
@@ -135,12 +104,8 @@ public final class ResourcePackSetup {
 				""".formatted(itemId);
 	}
 
-	/** GUI flat sprite + hand cuboid models; fallback uses the same intact flattening as other repairable items. */
-	private static String heldDisplayContextItemModel(String itemId) {
-		if (!HeldCuboidItemModels.UMBRELLA.equals(itemId)) {
-			return flatIntactItemAsset(itemId);
-		}
-		String guiFallback = flatIntactItemModelNode(itemId);
+	/** GUI flat sprite + hand cuboid models; omits artifacts:needs_repair for vanilla clients. */
+	private static String umbrellaDisplayContextItemModel() {
 		return """
 				{
 				  "model": {
@@ -169,18 +134,12 @@ public final class ResourcePackSetup {
 				        }
 				      }
 				    ],
-				    "fallback": %s
+				    "fallback": {
+				      "type": "minecraft:model",
+				      "model": "artifacts:item/umbrella"
+				    }
 				  }
 				}
-				""".formatted(guiFallback);
-	}
-
-	private static String flatIntactItemModelNode(String itemId) {
-		return """
-				{
-				  "type": "minecraft:model",
-				  "model": "artifacts:item/%s"
-				}
-				""".formatted(itemId);
+				""";
 	}
 }
