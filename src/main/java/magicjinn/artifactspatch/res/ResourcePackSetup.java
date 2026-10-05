@@ -4,7 +4,6 @@ import artifacts.Artifacts;
 import eu.pb4.polymer.resourcepack.api.PackResource;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import eu.pb4.polymer.resourcepack.extras.api.ResourcePackExtras;
-import eu.pb4.polymer.resourcepack.extras.api.format.atlas.AtlasAsset;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.ItemAsset;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.model.BasicItemModel;
 import eu.pb4.polymer.resourcepack.extras.api.format.item.property.bool.BooleanProperty;
@@ -14,7 +13,6 @@ public final class ResourcePackSetup {
 	private static final String ARTIFACTS_BRIDGED_ITEMS_PREFIX = "assets/artifacts/items/-/item/";
 	private static final String ARTIFACTS_HELD_MODELS_PREFIX = "assets/artifacts/models/item/";
 	private static final String HELD_ITEM_TEXTURE = HeldCuboidItemModels.HELD_ITEM_ATLAS_SPRITE;
-	private static final String MINECRAFT_BLOCKS_ATLAS_PATH = "assets/minecraft/atlases/blocks.json";
 
 	private ResourcePackSetup() {
 	}
@@ -33,28 +31,43 @@ public final class ResourcePackSetup {
 
 	private static PackResource convertPackResource(String path, PackResource resource) {
 		resource = fixHeldCuboidModelTextures(path, resource);
+		resource = patchUmbrellaHeldDisplays(path, resource);
 		resource = patchHeldDisplayContextItemAssets(path, resource);
 		resource = stripNeedsRepairItemModels(path, resource);
-		resource = mergeHeldSpriteIntoBlocksAtlas(path, resource);
 		return resource;
 	}
 
-	// POLYMER WORKAROUND: CuboidItemModelWrapper bakes on the blocks atlas; append a single source via Polymer AtlasAsset API.
-	private static PackResource mergeHeldSpriteIntoBlocksAtlas(String path, PackResource resource) {
-		if (!MINECRAFT_BLOCKS_ATLAS_PATH.equals(path)) {
+	/**
+	 * POLYMER WORKAROUND: Artifacts' SpearAnimationsMixin forces idle spear xRot to -π/4 (upright) and eases
+	 * attack; vanilla spear pose leans ~45° into the face. Tip the held model back and mirror on X so the
+	 * attack arc matches Artifacts' horizontal direction. FP blocking is patched separately; TP blocking
+	 * stays on umbrella_held_blocking unchanged.
+	 */
+	private static PackResource patchUmbrellaHeldDisplays(String path, PackResource resource) {
+		if (!path.startsWith(ARTIFACTS_HELD_MODELS_PREFIX) || !path.endsWith(".json")) {
 			return resource;
 		}
-		String json = resource.asString();
-		if (json.contains(HELD_ITEM_TEXTURE)) {
-			return resource;
+		String fileName = path.substring(ARTIFACTS_HELD_MODELS_PREFIX.length());
+		String content = resource.asString();
+		if ("umbrella_held.json".equals(fileName)) {
+			// Stock thirdperson is [0,0,0] + [0,0,2]; spear arm alone leaves a ~45° forward lean.
+			// +45 tips back upright; -45 was forward again. Raise Y so the canopy clears the head.
+			content = content.replace(
+					"\"thirdperson_righthand\": {\n      \"rotation\": [0, 0, 0],\n      \"translation\": [0, 0, 2]\n    }",
+					"\"thirdperson_righthand\": {\n      \"rotation\": [45, 0, 0],\n      \"translation\": [0, 8, 2],\n      \"scale\": [-1, 1, 1]\n    }"
+			);
+			content = content.replace(
+					"\"thirdperson_lefthand\": {\n      \"rotation\": [0, 0, 0],\n      \"translation\": [0, 0, 2]\n    }",
+					"\"thirdperson_lefthand\": {\n      \"rotation\": [45, 0, 0],\n      \"translation\": [0, 8, 2],\n      \"scale\": [-1, 1, 1]\n    }"
+			);
+			return PackResource.fromString(content);
 		}
-		AtlasAsset atlas = AtlasAsset.fromJson(json);
-		var merged = AtlasAsset.builder();
-		for (var source : atlas.sources()) {
-			merged.add(source);
+		if ("umbrella_held_blocking.json".equals(fileName)) {
+			// Only firstperson uses [-90, 22.5, 0]; thirdperson stays [-45, 0, -15].
+			content = content.replace("\"rotation\": [-90, 22.5, 0]", "\"rotation\": [90, 22.5, -90]");
+			return PackResource.fromString(content);
 		}
-		merged.single(Artifacts.id("item/" + HeldCuboidItemModels.HELD_TEXTURE_PATH));
-		return PackResource.fromString(merged.build().toJson());
+		return resource;
 	}
 
 	/** Polymer also emits bridged {@code items/-/item/<id>.json} from {@code models/item/}; keep it in sync with {@code items/<id>.json}. */

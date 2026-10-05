@@ -34,8 +34,9 @@ public record PolyArtifactsItem(Item item) implements VanillaModeledPolymerItem 
 		return NON_POLYMER_FOOD_ITEMS.contains(BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath());
 	}
 
-	// POLYMER WORKAROUND: Vanilla clients have no Artifacts item ids; trial_key is a vanilla type that accepts
-	// custom item models from the Polymer pack (Artifacts models bridged via ResourcePackExtras).
+	// POLYMER WORKAROUND: Vanilla clients have no Artifacts item ids; most items use trial_key + custom models.
+	// Umbrella is in #minecraft:spears on Artifacts clients for upright 3rd-person hold; use a spear stand-in so
+	// vanilla clients get the same arm pose (trial_key leaves the grip mid-shaft and clips the canopy).
 	@Override
 	public Item getPolymerItem(ItemStack itemStack, PacketContext packetContext) {
 		if (isNonPolymerFood(itemStack)) {
@@ -48,19 +49,21 @@ public record PolyArtifactsItem(Item item) implements VanillaModeledPolymerItem 
 				return Items.COOKED_BEEF;
 			}
 		}
+		if (HeldCuboidItemModels.UMBRELLA.equals(BuiltInRegistries.ITEM.getKey(item).getPath())) {
+			return Items.WOODEN_SPEAR;
+		}
 		return Items.TRIAL_KEY;
 	}
 
 	@Override
 	public Identifier getPolymerItemModel(ItemStack stack, PacketContext context, HolderLookup.Provider lookup) {
 		var path = BuiltInRegistries.ITEM.getKey(item).getPath();
-		var modelId = Artifacts.id("item/" + path);
-		// POLYMER WORKAROUND: bridgeModel points at assets/.../items/-/item/<id>.json (BasicItemModel from models/item),
-		// which is only the flat generated icon. Hand display_context lives in assets/artifacts/items/<id>.json.
+		// POLYMER WORKAROUND: Hand display_context lives in assets/artifacts/items/<id>.json (item model id artifacts:<id>).
+		// bridgeModel(artifacts:item/<id>) is artifacts:-/item/<id> (flat BasicItemModel from models/item only).
 		if (HeldCuboidItemModels.HELD_DISPLAY_CONTEXT_ITEMS.contains(path)) {
-			return modelId;
+			return Artifacts.id(path);
 		}
-		return ResourcePackExtras.bridgeModel(modelId);
+		return ResourcePackExtras.bridgeModel(Artifacts.id("item/" + path));
 	}
 
 	// POLYMER WORKAROUND: Trinkets Polymer is a server dependency; vanilla clients cannot install Trinkets, so
