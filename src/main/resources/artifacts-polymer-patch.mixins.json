@@ -1,0 +1,20 @@
+{
+	"required": true,
+	"package": "magicjinn.artifactspatch.mixin",
+	"compatibilityLevel": "JAVA_21",
+	"mixins": [
+		"EnderpearlItemWarpDriveMixin",
+		"EquipmentAttributeModifierTickerMixin",
+		"FabricRegisterMixin",
+		"LivingEntityEverlastingFoodMixin",
+		"NetworkHandlerMixin",
+		"PlayerAquaDashersPolymerMixin",
+		"PlayerToolTierPolymerMixin",
+		"ServerPlayerGameModeDigSpeedMixin",
+		"SwimDataComponentMixin",
+		"SwimInAirTooltipMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}
