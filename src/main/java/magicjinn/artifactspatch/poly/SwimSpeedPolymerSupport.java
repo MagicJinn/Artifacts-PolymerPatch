@@ -1,6 +1,9 @@
 package magicjinn.artifactspatch.poly;
 
+import artifacts.component.SwimData;
+import artifacts.platform.PlatformServices;
 import artifacts.registry.ModAttributes;
+import artifacts.registry.ModDataComponents;
 import magicjinn.artifactspatch.ArtifactsPolymerPatch;
 import net.minecraft.network.protocol.game.ClientboundUpdateAttributesPacket;
 import net.minecraft.resources.Identifier;
@@ -69,6 +72,14 @@ public final class SwimSpeedPolymerSupport {
 		}
 
 		boolean inWater = player.isInWater() || player.isSwimming();
+		// Charm of Sinking: ExpandAbility FAIL makes isInWater false; sinking support owns water spoofs.
+		if (ModDataComponents.SINKING.on(player).findAny() && !inWater) {
+			SwimData swimData = PlatformServices.getPlatformHelper().getSwimData(player);
+			if (swimData == null || !swimData.isSwimFlying()) {
+				clear(player);
+				return;
+			}
+		}
 		int grace = WATER_GRACE.getOrDefault(player.getUUID(), 0);
 		if (inWater) {
 			grace = WATER_GRACE_TICKS;

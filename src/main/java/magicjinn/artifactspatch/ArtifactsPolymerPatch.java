@@ -5,7 +5,9 @@ import magicjinn.artifactspatch.command.ArtifactsDebugCommand;
 import magicjinn.artifactspatch.poly.PolymerClientChecks;
 import magicjinn.artifactspatch.poly.PolymerPlayerAttributeSync;
 import magicjinn.artifactspatch.poly.AquaDashersClientBarrierSupport;
+import magicjinn.artifactspatch.poly.CharmOfSinkingPolymerSupport;
 import magicjinn.artifactspatch.poly.CloudInABottlePolymerSupport;
+import magicjinn.artifactspatch.poly.HeliumFlamingoPolymerSupport;
 import magicjinn.artifactspatch.poly.SnowshoesClientSnowSupport;
 import magicjinn.artifactspatch.poly.SteadfastSpikesClientIceSupport;
 import magicjinn.artifactspatch.poly.StriderShoesClientMagmaSupport;
@@ -50,6 +52,8 @@ public class ArtifactsPolymerPatch implements ModInitializer {
 			SteadfastSpikesClientIceSupport.onDisconnect(handler.player);
 			CloudInABottlePolymerSupport.onDisconnect(handler.player);
 			SwimSpeedPolymerSupport.onDisconnect(handler.player);
+			HeliumFlamingoPolymerSupport.onDisconnect(handler.player);
+			CharmOfSinkingPolymerSupport.onDisconnect(handler.player);
 		});
 		ArtifactsDebugCommand.register();
 		LOGGER.info("Artifacts Polymer patch initialized");
