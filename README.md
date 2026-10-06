@@ -46,6 +46,7 @@ Optional on the **server**: [Accessories](https://modrinth.com/mod/accessories),
 - **Toggle trinkets (Polymer clients)**: Universal Attractor, night vision goggles, and similar items default to **on** (Artifacts’ toggle key is client-only).
 - **Aqua dashers (Polymer clients)**: per-viewer **client-only** waterlogged `barrier` footing via `ClientboundBlockUpdatePacket` while water-sprinting (server uses Artifacts fluid collision; world blocks unchanged).
 - **Cloud in a bottle (Polymer clients)**: server-side jump-input edge detection (`getLastClientInput`) that calls Artifacts `DoubleJump.jump` (Artifacts’ client packet path is skipped for vanilla clients).
+- **Flippers / swim speed (Polymer clients)**: while in water, spoofs a tiny `water_movement_efficiency` plus `movement_speed` so client swim accel matches Artifacts’ `swim_speed` multiply (large WME spoofs overshoot by cutting drag).
 - **Mimic (Polymer clients)**: interaction entity hitbox plus item display — chest on ground/idle, mimic spawn egg model while airborne.
 
 Workarounds in source are tagged `POLYMER WORKAROUND:` (grep the repo). **Chorus totem / equipable totem** death protection is fully server-side in Artifacts and needs no patch workaround.
@@ -61,6 +62,7 @@ Workarounds in source are tagged `POLYMER WORKAROUND:` (grep the repo). **Chorus
 | Artifact abilities / combat | **Server-side**; should function; client-only feedback may be missing |
 | Aqua dashers water sprint | **Server** fluid collision + **client-predicted** footing (fake waterlogged barriers for that viewer only) |
 | Cloud in a bottle double jump | **Works** via server jump-input edge detection (slight latency vs Artifacts client prediction) |
+| Flippers swim speed | **Works** via spoofed WME + movement speed (terminal velocity matched to Artifacts) |
 | Mimic mob | **Interaction** hitbox (mimic size) + item display: **chest** on ground/idle, **mimic spawn egg** while airborne |
 | Artifact toggle key / config UI | **Not available** on vanilla clients; toggle trinkets are forced **on** while equipped |
 | Custom sounds at player | Server plays sounds; duplicate client packet is skipped for vanilla |

@@ -17,5 +17,7 @@ public final class PolymerPlayerAttributeSync {
 				player.getId(),
 				player.getAttributes().getSyncableAttributes()
 		));
+		// POLYMER WORKAROUND: Full sync restores real water_movement_efficiency; re-apply flippers spoof.
+		SwimSpeedPolymerSupport.afterAttributeSync(player);
 	}
 }
