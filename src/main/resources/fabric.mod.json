@@ -1,0 +1,31 @@
+{
+	"schemaVersion": 1,
+	"id": "artifacts-polymer-patch",
+	"version": "${version}",
+	"name": "Artifacts Polymer Patch",
+	"description": "A Polymer patch for Artifacts to make it run on the server.",
+	"authors": [
+		"MagicJinn"
+	],
+	"contact": {
+		"homepage": "https://github.com/MagicJinn/Artifacts-PolymerPatch",
+		"issues": "https://github.com/MagicJinn/Artifacts-PolymerPatch/issues"
+	},
+	"license": "MIT",
+	"icon": "assets/artifacts-polymer-patch/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"magicjinn.artifactspolymer.ArtifactsPolymerPatch"
+		]
+	},
+	"mixins": [
+		"artifacts-polymer-patch.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.19.5",
+		"minecraft": "~26.1.2",
+		"java": ">=25",
+		"fabric-api": "*"
+	}
+}
