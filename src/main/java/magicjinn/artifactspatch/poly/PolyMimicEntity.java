@@ -11,14 +11,17 @@ import eu.pb4.polymer.virtualentity.api.data.InteractionEntityData;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import magicjinn.artifactspatch.ArtifactsPolymerPatch;
 import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Brightness;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.LightLayer;
 import org.joml.Vector3f;
 
 import java.util.List;
@@ -68,6 +71,7 @@ public final class PolyMimicEntity implements PolymerEntity {
 		private final MimicEntity mimic;
 		private final ItemDisplayElement display;
 		private boolean showingSpawnEgg;
+		private int lastPackedBrightness = Integer.MIN_VALUE;
 
 		private MimicVisualHolder(MimicEntity mimic) {
 			this.mimic = mimic;
@@ -80,6 +84,7 @@ public final class PolyMimicEntity implements PolymerEntity {
 			this.display.setVisibilityPredicate(PolymerClientChecks::lacksArtifactsClient);
 			applyVisual(mimic.ticksInAir > 0);
 			this.display.setYaw(mimic.getYRot());
+			updateBrightness();
 			addElement(this.display);
 		}
 
@@ -90,6 +95,22 @@ public final class PolyMimicEntity implements PolymerEntity {
 				applyVisual(inAir);
 			}
 			this.display.setYaw(this.mimic.getYRot());
+			updateBrightness();
+		}
+
+		private void updateBrightness() {
+			// Sample the mimic AABB center so wall-clipped corners do not blacken the display.
+			BlockPos samplePos = BlockPos.containing(this.mimic.getBoundingBox().getCenter());
+			var level = this.mimic.level();
+			Brightness brightness = new Brightness(
+					level.getBrightness(LightLayer.BLOCK, samplePos),
+					level.getBrightness(LightLayer.SKY, samplePos)
+			);
+			int packed = brightness.pack();
+			if (packed != this.lastPackedBrightness) {
+				this.lastPackedBrightness = packed;
+				this.display.setBrightness(brightness);
+			}
 		}
 
 		private void applyVisual(boolean inAir) {

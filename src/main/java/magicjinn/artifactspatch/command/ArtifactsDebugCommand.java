@@ -1,7 +1,10 @@
 package magicjinn.artifactspatch.command;
 
 import artifacts.Artifacts;
+import artifacts.config.ItemConfigs;
+import artifacts.config.value.ConfigValue;
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import magicjinn.artifactspatch.ArtifactsPolymerPatch;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.commands.CommandSourceStack;
@@ -26,6 +29,11 @@ import java.util.Comparator;
 import java.util.List;
 
 public final class ArtifactsDebugCommand {
+	/** TEMPORARY debug only: in-memory override, not written to items.toml. */
+	private static final int DEFAULT_ANGLERS_HAT_TEST_LEVELS = 20;
+	private static Integer savedLureBonus;
+	private static Integer savedLuckBonus;
+
 	private ArtifactsDebugCommand() {
 	}
 
@@ -38,16 +46,88 @@ public final class ArtifactsDebugCommand {
 			net.minecraft.commands.CommandBuildContext registryAccess,
 			Commands.CommandSelection environment
 	) {
+		var anglersHat = Commands.literal("anglershat")
+				.then(Commands.literal("boost")
+						.executes(ctx -> boostAnglersHat(ctx.getSource(), DEFAULT_ANGLERS_HAT_TEST_LEVELS))
+						.then(Commands.argument("levels", IntegerArgumentType.integer(0, 100))
+								.executes(ctx -> boostAnglersHat(
+										ctx.getSource(),
+										IntegerArgumentType.getInteger(ctx, "levels")
+								))))
+				.then(Commands.literal("reset")
+						.executes(ctx -> resetAnglersHat(ctx.getSource())));
+
 		var root = Commands.literal("artifactspatch")
 				.requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
-				.then(Commands.literal("all").executes(ctx -> placeAllArtifactsChest(ctx.getSource())));
+				.then(Commands.literal("all").executes(ctx -> placeAllArtifactsChest(ctx.getSource())))
+				.then(anglersHat);
 
 		var alias = Commands.literal("artifacts-polymer")
 				.requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
-				.then(Commands.literal("all").executes(ctx -> placeAllArtifactsChest(ctx.getSource())));
+				.then(Commands.literal("all").executes(ctx -> placeAllArtifactsChest(ctx.getSource())))
+				.then(anglersHat);
 
 		dispatcher.register(root);
 		dispatcher.register(alias);
+	}
+
+	/**
+	 * TEMPORARY: bumps Angler's Hat lure / luck-of-the-sea bonuses in memory for fishing tests.
+	 * Does not persist to config. Use {@code reset} (or restart) to undo.
+	 */
+	private static int boostAnglersHat(CommandSourceStack source, int levels) {
+		ItemConfigs.AnglersHat hat = Artifacts.CONFIG.items.anglersHat;
+		if (savedLureBonus == null) {
+			savedLureBonus = hat.lureLevelBonus.get();
+			savedLuckBonus = hat.luckOfTheSeaLevelBonus.get();
+		}
+		hat.lureLevelBonus.set(levels);
+		hat.luckOfTheSeaLevelBonus.set(levels);
+
+		source.sendSuccess(
+				() -> Component.literal(
+						"[TEMPORARY] Angler's Hat lure/luck bonuses set to "
+								+ levels
+								+ " (was "
+								+ savedLureBonus
+								+ "/"
+								+ savedLuckBonus
+								+ "). In-memory only. Run /artifactspatch anglershat reset to restore."
+				),
+				true
+		);
+		ArtifactsPolymerPatch.LOGGER.info(
+				"TEMPORARY anglers hat boost: lure/luck -> {} (saved {}/{})",
+				levels,
+				savedLureBonus,
+				savedLuckBonus
+		);
+		return levels;
+	}
+
+	private static int resetAnglersHat(CommandSourceStack source) {
+		ItemConfigs.AnglersHat hat = Artifacts.CONFIG.items.anglersHat;
+		ConfigValue<Integer> lure = hat.lureLevelBonus;
+		ConfigValue<Integer> luck = hat.luckOfTheSeaLevelBonus;
+
+		int lureRestore = savedLureBonus != null ? savedLureBonus : lure.getDefaultValue();
+		int luckRestore = savedLuckBonus != null ? savedLuckBonus : luck.getDefaultValue();
+		lure.set(lureRestore);
+		luck.set(luckRestore);
+		savedLureBonus = null;
+		savedLuckBonus = null;
+
+		source.sendSuccess(
+				() -> Component.literal(
+						"[TEMPORARY] Angler's Hat lure/luck bonuses restored to "
+								+ lureRestore
+								+ "/"
+								+ luckRestore
+								+ "."
+				),
+				true
+		);
+		return 1;
 	}
 
 	private static int placeAllArtifactsChest(CommandSourceStack source) {
