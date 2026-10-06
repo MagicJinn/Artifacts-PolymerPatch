@@ -2,6 +2,8 @@ package magicjinn.artifactspatch.poly;
 
 import artifacts.component.ability.DoubleJump;
 import artifacts.registry.ModDataComponents;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.level.ServerPlayer;
 
@@ -12,7 +14,7 @@ import java.util.UUID;
 // POLYMER WORKAROUND: Cloud in a Bottle double jump is driven by Artifacts' client input handler
 // (CloudInABottleInputHandler -> DoubleJumpPacket). Vanilla/Polymer clients never send that packet.
 // Mirror the same press/release edge detection on the server using getLastClientInput().jump(),
-// then call Artifacts' DoubleJump.jump (sound included) and sync motion to the client.
+// then call Artifacts' DoubleJump.jump (sound) plus the packet's particle burst and a motion sync.
 public final class CloudInABottlePolymerSupport {
 	private static final Map<UUID, State> STATES = new HashMap<>();
 
@@ -41,6 +43,7 @@ public final class CloudInABottlePolymerSupport {
 			state.canDoubleJump = false;
 			DoubleJump.jump(player);
 			player.connection.send(new ClientboundSetEntityMotionPacket(player));
+			spawnParticles(player);
 		}
 	}
 
@@ -57,6 +60,26 @@ public final class CloudInABottlePolymerSupport {
 		}
 		// Match Artifacts client: water counts as grounded unless Charm of Sinking is active.
 		return ModDataComponents.SINKING.on(player).findAny();
+	}
+
+	private static void spawnParticles(ServerPlayer player) {
+		ParticleOptions particle = player.isInWater() ? ParticleTypes.BUBBLE : ParticleTypes.POOF;
+		for (int i = 0; i < 20; i++) {
+			double motionX = player.getRandom().nextGaussian() * 0.02;
+			double motionY = player.getRandom().nextGaussian() * 0.02 + 0.20;
+			double motionZ = player.getRandom().nextGaussian() * 0.02;
+			player.level().sendParticles(
+					particle,
+					player.getX(),
+					player.getY(),
+					player.getZ(),
+					1,
+					motionX,
+					motionY,
+					motionZ,
+					0.15
+			);
+		}
 	}
 
 	private static final class State {

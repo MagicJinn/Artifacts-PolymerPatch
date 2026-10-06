@@ -39,7 +39,7 @@ Optional on the **server**: [Accessories](https://modrinth.com/mod/accessories),
 - **Items (held / inventory)**: `PolyArtifactsItem` overlays with Artifacts `assets/artifacts/items` models bridged into the Polymer pack, including server-side `artifacts:needs_repair` item model property. Items with Artifacts cuboid `*_held` models (currently **umbrella**) keep flat GUI sprites and use the existing held JSON in hand via `minecraft:display_context` / `minecraft:using_item` in the generated pack.
 - **Networking**: skips Artifacts **clientbound** custom payloads when the client cannot receive them (avoids disconnects on vanilla clients).
 - **CCA**: limits `SwimDataComponent` sync to clients that can receive Artifacts swim packets.
-- **Digging claws (Polymer clients)**: server destroy-progress scaling so break time matches server `BLOCK_BREAK_SPEED` from Artifacts (vanilla clients still gate mining on local attributes).
+- **Digging claws (Polymer clients)**: server finishes the break once server destroy progress reaches 1 (vanilla clients gate `STOP_DESTROY_BLOCK` on local attributes / tool tier, so speed and stone-tier harvest would otherwise never apply).
 - **Resource pack**: rewrites `assets/artifacts/items/*.json` in the generated pack to drop `artifacts:needs_repair` conditions (vanilla clients cannot load that property).
 - **Everlasting beef / eternal steak**: polymer wire type is vanilla beef (eat animation); after eat the server shrinks once and refills the slot like a bottle remainder so client prediction matches.
 - **Tooltips**: server-safe helium flamingo ability text (no `ModKeyMappings` / client key bindings on dedicated server during Polymer tooltip build).

@@ -1,84 +1,33 @@
 package magicjinn.artifactspatch.poly;
 
-import artifacts.Artifacts;
-import net.minecraft.core.Holder;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.Mth;
-import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraft.world.entity.ai.attributes.AttributeInstance;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.server.level.ServerPlayerGameMode;
 import net.minecraft.world.level.block.state.BlockState;
 
-// POLYMER WORKAROUND: Vanilla clients gate mining on local BLOCK_BREAK_SPEED; Artifacts applies digging claws
-// bonuses server-side only. Scale server destroy progress so break time matches the server's attribute value.
+// POLYMER WORKAROUND: Vanilla clients decide when to send STOP_DESTROY_BLOCK from local destroy progress
+// (BLOCK_BREAK_SPEED + hasCorrectToolForDrops /30 vs /100). Artifacts applies digging claws on the server
+// only, so Polymer clients never finish early. Finish the break server-side once server progress reaches 1.
 public final class DiggingClawsPolymerSupport {
 	private DiggingClawsPolymerSupport() {
 	}
 
-	public static float destroyProgressMultiplier(ServerPlayer player, BlockState state) {
-		if (!PolymerClientChecks.lacksArtifactsClient(player)) {
-			return 1.0F;
+	public static boolean shouldFinishDestroy(ServerPlayer player, BlockState state, BlockPos pos, int elapsedTicks) {
+		if (!PolymerClientChecks.lacksArtifactsClient(player) || state.isAir()) {
+			return false;
 		}
-
-		float serverSpeed = player.getDestroySpeed(state);
-		float clientSpeed = estimateClientDestroySpeed(player, state);
-		if (clientSpeed <= 1.0E-4F || serverSpeed <= clientSpeed) {
-			return 1.0F;
-		}
-		return Mth.clamp(serverSpeed / clientSpeed, 1.0F, 64.0F);
+		float progress = state.getDestroyProgress(player, player.level(), pos) * (elapsedTicks + 1);
+		return progress >= 1.0F;
 	}
 
-	private static float estimateClientDestroySpeed(ServerPlayer player, BlockState state) {
-		float serverSpeed = player.getDestroySpeed(state);
-		double serverAttr = player.getAttributeValue(Attributes.BLOCK_BREAK_SPEED);
-		double clientAttr = attributeValueExcludingNamespace(player, Attributes.BLOCK_BREAK_SPEED, Artifacts.MOD_ID);
-		if (serverAttr <= 1.0E-6 || Math.abs(serverAttr - clientAttr) < 1.0E-6) {
-			return serverSpeed;
-		}
-		return serverSpeed * (float) (clientAttr / serverAttr);
-	}
-
-	private static double attributeValueExcludingNamespace(
+	public static void finishDestroy(
+			ServerPlayerGameMode gameMode,
 			ServerPlayer player,
-			Holder<Attribute> attribute,
-			String excludedNamespace
+			ServerLevel level,
+			BlockPos pos
 	) {
-		AttributeInstance instance = player.getAttribute(attribute);
-		if (instance == null) {
-			return player.getAttributeBaseValue(attribute);
-		}
-
-		double value = instance.getBaseValue();
-
-		for (AttributeModifier modifier : instance.getModifiers()) {
-			if (excludedNamespace.equals(modifier.id().getNamespace())) {
-				continue;
-			}
-			if (modifier.operation() == AttributeModifier.Operation.ADD_VALUE) {
-				value += modifier.amount();
-			}
-		}
-
-		double multipliedBase = value;
-		for (AttributeModifier modifier : instance.getModifiers()) {
-			if (excludedNamespace.equals(modifier.id().getNamespace())) {
-				continue;
-			}
-			if (modifier.operation() == AttributeModifier.Operation.ADD_MULTIPLIED_BASE) {
-				multipliedBase += value * modifier.amount();
-			}
-		}
-		value = multipliedBase;
-
-		for (AttributeModifier modifier : instance.getModifiers()) {
-			if (excludedNamespace.equals(modifier.id().getNamespace())) {
-				continue;
-			}
-			if (modifier.operation() == AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL) {
-				value *= 1.0 + modifier.amount();
-			}
-		}
-		return value;
+		level.destroyBlockProgress(player.getId(), pos, -1);
+		gameMode.destroyBlock(pos);
 	}
 }
