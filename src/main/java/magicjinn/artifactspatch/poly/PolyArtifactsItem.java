@@ -71,6 +71,7 @@ public record PolyArtifactsItem(Item item) implements VanillaModeledPolymerItem 
 	@Override
 	public void modifyClientTooltip(List<Component> tooltip, ItemStack stack, PacketContext context) {
 		tooltip.removeIf(PolyArtifactsItem::isMissingTrinketsDependencyLine);
+		PolymerWorkaroundTooltips.append(tooltip, stack);
 	}
 
 	private static boolean isMissingTrinketsDependencyLine(Component line) {
