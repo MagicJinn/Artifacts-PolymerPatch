@@ -45,6 +45,7 @@ Optional on the **server**: [Accessories](https://modrinth.com/mod/accessories),
 - **Tooltips**: server-safe helium flamingo ability text (no `ModKeyMappings` / client key bindings on dedicated server during Polymer tooltip build).
 - **Toggle trinkets (Polymer clients)**: Universal Attractor, night vision goggles, and similar items default to **on** (Artifacts’ toggle key is client-only).
 - **Aqua dashers (Polymer clients)**: per-viewer **client-only** waterlogged `barrier` footing via `ClientboundBlockUpdatePacket` while water-sprinting (server uses Artifacts fluid collision; world blocks unchanged).
+- **Cloud in a bottle (Polymer clients)**: server-side jump-input edge detection (`getLastClientInput`) that calls Artifacts `DoubleJump.jump` (Artifacts’ client packet path is skipped for vanilla clients).
 - **Mimic (Polymer clients)**: interaction entity hitbox plus item display — chest on ground/idle, mimic spawn egg model while airborne.
 
 Workarounds in source are tagged `POLYMER WORKAROUND:` (grep the repo). **Chorus totem / equipable totem** death protection is fully server-side in Artifacts and needs no patch workaround.
@@ -59,6 +60,7 @@ Workarounds in source are tagged `POLYMER WORKAROUND:` (grep the repo). **Chorus
 | Worn Artifacts on player body | **Not shown** (Artifacts client 3D meshes only; Polymer virtual item displays were removed as unstable) |
 | Artifact abilities / combat | **Server-side**; should function; client-only feedback may be missing |
 | Aqua dashers water sprint | **Server** fluid collision + **client-predicted** footing (fake waterlogged barriers for that viewer only) |
+| Cloud in a bottle double jump | **Works** via server jump-input edge detection (slight latency vs Artifacts client prediction) |
 | Mimic mob | **Interaction** hitbox (mimic size) + item display: **chest** on ground/idle, **mimic spawn egg** while airborne |
 | Artifact toggle key / config UI | **Not available** on vanilla clients; toggle trinkets are forced **on** while equipped |
 | Custom sounds at player | Server plays sounds; duplicate client packet is skipped for vanilla |
