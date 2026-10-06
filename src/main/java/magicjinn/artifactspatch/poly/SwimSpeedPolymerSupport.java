@@ -13,6 +13,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -20,8 +21,10 @@ import java.util.concurrent.ConcurrentHashMap;
  * POLYMER WORKAROUND: Flippers use ADD_MULTIPLIED_BASE on artifacts:swim_speed (default +70%).
  * Artifacts only multiplies travelInWater's moveRelative accel; drag is unchanged. Vanilla clients
  * never run that mixin. Spoof a tiny water_movement_efficiency (so movement_speed affects swim
- * accel) plus enough movement_speed that client moveRelative matches Artifacts' boosted accel,
- * without the large WME terminal-velocity trick that overshoots (~8 vs ~6.7).
+ * accel) plus enough movement_speed that client moveRelative matches Artifacts' boosted accel.
+ *
+ * Mid-water sprint-swim is the fragile case: server sprint attribute syncs wipe our movement_speed
+ * spoof (ocean-floor wading does not toggle sprint). Resend the spoof every tick while active.
  */
 public final class SwimSpeedPolymerSupport {
 	private static final double BASE_SWIM_ACCEL = 0.02;
@@ -40,8 +43,11 @@ public final class SwimSpeedPolymerSupport {
 	private static final double SPOOF_BONUS_SCALE = (6.7 / 3.92 - 1.0) / (7.54 / 3.92 - 1.0);
 	private static final Identifier MS_DELTA_ID = ArtifactsPolymerPatch.id("polymer_swim_ms");
 	private static final Identifier WME_DELTA_ID = ArtifactsPolymerPatch.id("polymer_swim_wme");
+	/** Keep spoof briefly if isInWater flickers at the surface. */
+	private static final int WATER_GRACE_TICKS = 5;
 
-	private static final Map<UUID, Spoof> LAST_SENT = new ConcurrentHashMap<>();
+	private static final Set<UUID> ACTIVE = ConcurrentHashMap.newKeySet();
+	private static final Map<UUID, Integer> WATER_GRACE = new ConcurrentHashMap<>();
 
 	private SwimSpeedPolymerSupport() {
 	}
@@ -57,33 +63,43 @@ public final class SwimSpeedPolymerSupport {
 		}
 
 		double swimSpeed = player.getAttributeValue(ModAttributes.SWIM_SPEED);
-		if (!player.isInWater() || swimSpeed <= 1.0001) {
+		if (swimSpeed <= 1.0001) {
 			clear(player);
 			return;
 		}
 
-		Spoof spoof = computeSpoof(player, swimSpeed);
-		Spoof last = LAST_SENT.get(player.getUUID());
-		if (last != null && last.matches(spoof)) {
+		boolean inWater = player.isInWater() || player.isSwimming();
+		int grace = WATER_GRACE.getOrDefault(player.getUUID(), 0);
+		if (inWater) {
+			grace = WATER_GRACE_TICKS;
+		} else if (grace > 0) {
+			grace--;
+		}
+		if (grace <= 0) {
+			WATER_GRACE.remove(player.getUUID());
+			clear(player);
 			return;
 		}
+		WATER_GRACE.put(player.getUUID(), grace);
 
-		sendSpoof(player, spoof);
-		LAST_SENT.put(player.getUUID(), spoof);
+		// Resend every tick: sprint / equipment attribute syncs otherwise wipe the spoof.
+		sendSpoof(player, computeSpoof(player, swimSpeed));
+		ACTIVE.add(player.getUUID());
 	}
 
 	/** Re-apply after a full attribute sync so real snapshots do not wipe the spoof. */
 	public static void afterAttributeSync(ServerPlayer player) {
-		LAST_SENT.remove(player.getUUID());
 		tick(player);
 	}
 
 	public static void onDisconnect(ServerPlayer player) {
-		LAST_SENT.remove(player.getUUID());
+		ACTIVE.remove(player.getUUID());
+		WATER_GRACE.remove(player.getUUID());
 	}
 
 	private static void clear(ServerPlayer player) {
-		if (LAST_SENT.remove(player.getUUID()) == null) {
+		WATER_GRACE.remove(player.getUUID());
+		if (!ACTIVE.remove(player.getUUID())) {
 			return;
 		}
 		sendReal(player);
@@ -92,36 +108,35 @@ public final class SwimSpeedPolymerSupport {
 	private static Spoof computeSpoof(ServerPlayer player, double swimSpeed) {
 		AttributeInstance msInst = player.getAttribute(Attributes.MOVEMENT_SPEED);
 		AttributeInstance wmeInst = player.getAttribute(Attributes.WATER_MOVEMENT_EFFICIENCY);
+		// getSpeed() includes sprint; travelInWater uses that same value.
 		double realMs = msInst != null ? msInst.getValue() : 0.1;
 		double realWme = wmeInst != null ? wmeInst.getValue() : 0.0;
 
-		double groundFactor = player.onGround() ? 1.0 : 0.5;
+		// Prefer the swimming (!onGround) half-WME path; that is where flippers matter and where
+		// ocean-floor-calibrated spoofs previously broke.
+		boolean swimmingPath = player.isSwimming() || !player.onGround();
+		double groundFactor = swimmingPath ? 0.5 : 1.0;
 		double eReal = realWme * groundFactor;
-		// LivingEntity.getWaterSlowDown() is 0.8; sprinting uses 0.9 in travelInWater.
 		double d0 = player.isSprinting() ? 0.9 : 0.8;
 
-		// Artifacts: multiply moveRelative accel only. Scale (S-1) for speedometer parity.
 		double effectiveSwimSpeed = 1.0 + (swimSpeed - 1.0) * SPOOF_BONUS_SCALE;
 		double aArtifacts = (BASE_SWIM_ACCEL + (realMs - BASE_SWIM_ACCEL) * eReal) * effectiveSwimSpeed;
 		double dArtifacts = d0 + (WME_DRAG_TARGET - d0) * eReal;
 
-		// Need e > 0 for movement_speed to affect swim accel. Prefer keeping real WME (depth strider);
-		// otherwise use a tiny boost so drag barely changes.
 		double eClient = eReal > 1e-4 ? eReal : E_BOOST;
 		double wmeClient = Mth.clamp(eClient / groundFactor, 0.0, 1.0);
 		eClient = wmeClient * groundFactor;
 
-		// Match Artifacts terminal speed in the a*d/(1-d) model while keeping e (drag) near vanilla.
 		double vArtifacts = aArtifacts * dArtifacts / Math.max(1e-6, 1.0 - dArtifacts);
 		double dClient = d0 + (WME_DRAG_TARGET - d0) * eClient;
 		double aClient = vArtifacts * (1.0 - dClient) / Math.max(1e-6, dClient);
 
-		double msClient = eClient <= 1e-6
+		double msNeeded = eClient <= 1e-6
 				? realMs
 				: BASE_SWIM_ACCEL + (aClient - BASE_SWIM_ACCEL) / eClient;
-		msClient = Mth.clamp(msClient, 0.0, 1024.0);
+		msNeeded = Mth.clamp(msNeeded, 0.0, 1024.0);
 
-		return new Spoof(wmeClient, msClient);
+		return new Spoof(wmeClient, msNeeded);
 	}
 
 	private static void sendSpoof(ServerPlayer player, Spoof spoof) {
@@ -167,8 +182,5 @@ public final class SwimSpeedPolymerSupport {
 	}
 
 	private record Spoof(double wme, double movementSpeed) {
-		boolean matches(Spoof other) {
-			return Math.abs(wme - other.wme) < 1e-4 && Math.abs(movementSpeed - other.movementSpeed) < 1e-4;
-		}
 	}
 }
