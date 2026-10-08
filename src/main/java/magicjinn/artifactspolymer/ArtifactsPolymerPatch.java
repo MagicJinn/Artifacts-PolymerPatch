@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import artifacts.Artifacts;
 import eu.pb4.polymer.core.api.utils.PolymerUtils;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
+import magicjinn.artifactspolymer.resourcepack.ResourcePackSetup;
 
 public class ArtifactsPolymerPatch implements ModInitializer {
 	public static final String MOD_ID = "artifacts-polymer-patch";
@@ -22,6 +23,8 @@ public class ArtifactsPolymerPatch implements ModInitializer {
 
 		PolymerResourcePackUtils.addModAssets(Artifacts.MOD_ID);
 		PolymerResourcePackUtils.addModAssets(MOD_ID);
+
+		ResourcePackSetup.setup();
 
 		// Mark all worldgen features as server-side
 		PolymerUtils.markAsServerOnlyRegistry(Registries.FEATURE);

@@ -18,7 +18,7 @@ import eu.pb4.polymer.core.api.other.PolymerMobEffect;
 import eu.pb4.polymer.core.api.other.PolymerSoundEvent;
 import eu.pb4.polymer.core.api.utils.PolymerSyncedObject;
 import magicjinn.artifactspolymer.polymer.ArtifactsPolymerItem;
-import magicjinn.artifactspolymer.polymer.PolyMimicEntity;
+import magicjinn.artifactspolymer.polymer.mimic.PolyMimicEntity;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentType;

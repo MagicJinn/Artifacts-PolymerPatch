@@ -26,6 +26,15 @@
 		"fabricloader": ">=0.19.5",
 		"minecraft": "~26.1.2",
 		"java": ">=25",
-		"fabric-api": "*"
+		"fabric-api": "*",
+		"artifacts": ">=15.1.3",
+		"polymer-core": "*",
+		"polymer-resource-pack": "*",
+		"polymer-virtual-entity": "*",
+		"factorytools": "*"
+		},
+	"suggests": {
+		"trinkets_updated": "*",
+		"trinkets-polymer-patch": "*"
 	}
 }
