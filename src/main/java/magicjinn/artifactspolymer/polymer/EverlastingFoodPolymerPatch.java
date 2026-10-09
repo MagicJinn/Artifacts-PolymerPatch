@@ -28,7 +28,7 @@ public final class EverlastingFoodPolymerPatch {
 		});
 	}
 
-	/* Recursively nest enough USE_REMAINDER components to prevent slot resyncs */
+	/** Recursively nest enough USE_REMAINDER components to prevent slot resyncs */
 	private static UseRemainder recursiveUseRemainder(ItemStack appearance) {
 		ItemStack seed = appearance.copyWithCount(1);
 		seed.set(DataComponents.USE_REMAINDER, null);
