@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import artifacts.Artifacts;
 import eu.pb4.polymer.core.api.utils.PolymerUtils;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
+import magicjinn.artifactspolymer.polymer.EverlastingFoodPolymerPatch;
 import magicjinn.artifactspolymer.resourcepack.ResourcePackSetup;
 
 public class ArtifactsPolymerPatch implements ModInitializer {
@@ -25,6 +26,8 @@ public class ArtifactsPolymerPatch implements ModInitializer {
 		PolymerResourcePackUtils.addModAssets(MOD_ID);
 
 		ResourcePackSetup.setup();
+
+		EverlastingFoodPolymerPatch.patch();
 
 		// Mark all worldgen features as server-side
 		PolymerUtils.markAsServerOnlyRegistry(Registries.FEATURE);
