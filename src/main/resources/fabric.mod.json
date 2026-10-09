@@ -31,10 +31,8 @@
 		"polymer-core": "*",
 		"polymer-resource-pack": "*",
 		"polymer-virtual-entity": "*",
-		"factorytools": "*"
-		},
-	"suggests": {
-		"trinkets_updated": "*",
-		"trinkets-polymer-patch": "*"
+		"factorytools": "*",
+		"trinkets": "*",
+		"artifacts-polymer-patch": "*"
 	}
 }

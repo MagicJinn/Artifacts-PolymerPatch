@@ -3,7 +3,8 @@
 	"package": "magicjinn.artifactspolymer.mixin",
 	"compatibilityLevel": "JAVA_25",
 	"mixins": [
-		"FabricRegisterMixin"
+		"FabricRegisterMixin",
+		"ServerPlayerMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
