@@ -17,8 +17,9 @@ import eu.pb4.polymer.core.api.other.PolymerConsumeEffect;
 import eu.pb4.polymer.core.api.other.PolymerMobEffect;
 import eu.pb4.polymer.core.api.other.PolymerSoundEvent;
 import eu.pb4.polymer.core.api.utils.PolymerSyncedObject;
+import magicjinn.artifactspolymer.ArtifactsPolymerPatch;
 import magicjinn.artifactspolymer.polymer.ArtifactsPolymerItem;
-import magicjinn.artifactspolymer.polymer.mimic.PolyMimicEntity;
+import magicjinn.artifactspolymer.polymer.mimic.MimicPolymerEntity;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentType;
@@ -55,7 +56,7 @@ public class FabricRegisterMixin<R> {
             EntityType<?> entityType = (EntityType<?>) value;
             PolymerEntityUtils.registerOverlay(entityType, entity -> {
                 if (entity instanceof MimicEntity mimic)
-                    return new PolyMimicEntity(mimic);
+                    return new MimicPolymerEntity(mimic);
 
                 return context -> EntityType.ARMOR_STAND;
             });
@@ -89,7 +90,7 @@ public class FabricRegisterMixin<R> {
         } else if (registryKey.equals(Registries.FEATURE)) {
             // Worldgen features are all server-side. Nothing for Polymer clients to sync.
         } else {
-            throw new IllegalStateException("Guhh? Unknown registry key: " + registryKey);
+            ArtifactsPolymerPatch.LOGGER.error("Guhh? Unknown registry key: " + registryKey);
         }
     }
 }

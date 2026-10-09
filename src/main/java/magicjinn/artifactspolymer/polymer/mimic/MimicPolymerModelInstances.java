@@ -11,7 +11,7 @@ import net.minecraft.resources.Identifier;
  * {@link PolyModelInstance#generateAssets}
  * converts the layer into item-model JSON at Polymer pack build time.
  */
-public final class MimicPolymerEntityModels {
+public final class MimicPolymerModelInstances {
 	public static final Identifier ATTACHMENT_ID = ArtifactsPolymerPatch.id("mimic_polymer_model");
 
 	public static final Identifier ATLAS_TEXTURE = ArtifactsPolymerPatch.id("entity/mimic_polymer_atlas");
@@ -24,6 +24,6 @@ public final class MimicPolymerEntityModels {
 	@SuppressWarnings("unchecked")
 	public static final PolyModelInstance<EntityModel<MimicEntity>> MIMIC_POLY_MODEL = (PolyModelInstance<EntityModel<MimicEntity>>) (Object) MIMIC;
 
-	private MimicPolymerEntityModels() {
+	private MimicPolymerModelInstances() {
 	}
 }
