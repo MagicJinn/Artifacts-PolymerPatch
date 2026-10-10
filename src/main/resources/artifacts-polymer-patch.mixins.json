@@ -6,7 +6,11 @@
 		"FabricRegisterMixin",
 		"ServerPlayerMixin",
 		"ServerPlayerGameModeMixin",
-		"EnderpearlItemWarpDriveMixin"
+		"EnderpearlItemWarpDriveMixin",
+		"SwimInAirTooltipMixin",
+		"TooltipHelperMixin",
+		"EquipmentSlotManagerMixin",
+		"TrinketUtilitiesMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
