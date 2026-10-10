@@ -15,7 +15,8 @@ public final class PolymerWorkaroundTooltips {
             Map.entry("snowshoes", "Shows snow blocks in powder snow so walking stays in sync."),
             Map.entry("steadfast_spikes",
                     "Ice blocks are replaced with non-slippery ice so you don't slip out of sync."),
-            Map.entry("digging_claws", "Triggers block breaking early on the server."),
+            Map.entry("helium_flamingo", "Simulates swimming physics in the air."),
+                    Map.entry("digging_claws", "Triggers block breaking early on the server."),
             Map.entry("umbrella", "Held upright like a spear so the canopy looks right."));
 
     /** Appends the tooltip for the given item stack. */

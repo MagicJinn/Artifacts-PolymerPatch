@@ -14,6 +14,7 @@ import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import magicjinn.artifactspolymer.polymer.AquaDashersPolymerPatch;
 import magicjinn.artifactspolymer.polymer.CloudInABottlePolymerPatch;
 import magicjinn.artifactspolymer.polymer.EverlastingFoodPolymerPatch;
+import magicjinn.artifactspolymer.polymer.HeliumFlamingoPolymerPatch;
 import magicjinn.artifactspolymer.polymer.NonSlipIceBlocks;
 import magicjinn.artifactspolymer.polymer.SnowshoesPolymerPatch;
 import magicjinn.artifactspolymer.polymer.SteadfastSpikesPolymerPatch;
@@ -48,6 +49,7 @@ public class ArtifactsPolymerPatch implements ModInitializer {
 			SnowshoesPolymerPatch.onDisconnect(listener.player);
 			SteadfastSpikesPolymerPatch.onDisconnect(listener.player);
 			CloudInABottlePolymerPatch.onDisconnect(listener.player);
+			HeliumFlamingoPolymerPatch.onDisconnect(listener.player);
 		});
 
 	}
