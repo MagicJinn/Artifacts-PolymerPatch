@@ -1,5 +1,7 @@
 package magicjinn.artifactspolymer.polymer;
 
+import java.util.List;
+
 import artifacts.Artifacts;
 import eu.pb4.polymer.core.api.item.VanillaModeledPolymerItem;
 import eu.pb4.polymer.resourcepack.extras.api.ResourcePackExtras;
@@ -7,6 +9,7 @@ import magicjinn.artifactspolymer.resourcepack.HeldCuboidItemModels;
 import net.fabricmc.fabric.api.networking.v1.context.PacketContext;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -37,5 +40,11 @@ public record ArtifactsPolymerItem(Item item) implements VanillaModeledPolymerIt
             return Artifacts.id(path);
 
         return ResourcePackExtras.bridgeModel(Artifacts.id(ITEM_PATH + path));
+    }
+
+    @Override
+    public void modifyClientTooltip(List<Component> tooltip, ItemStack stack, PacketContext context) {
+        // POLYMER WORKAROUND: Add tooltip notes for Polymer workarounds.
+        PolymerWorkaroundTooltips.addMatchingTooltip(tooltip, stack);
     }
 }
