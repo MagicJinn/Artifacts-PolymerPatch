@@ -7,6 +7,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import magicjinn.artifactspolymer.polymer.AquaDashersPolymerPatch;
 import magicjinn.artifactspolymer.polymer.CloudInABottlePolymerPatch;
+import magicjinn.artifactspolymer.polymer.HeliumFlamingoPolymerPatch;
 import magicjinn.artifactspolymer.polymer.SnowshoesPolymerPatch;
 import magicjinn.artifactspolymer.polymer.SteadfastSpikesPolymerPatch;
 import magicjinn.artifactspolymer.polymer.StriderShoesPolymerPatch;
@@ -23,6 +24,7 @@ public class ServerPlayerMixin {
         AquaDashersPolymerPatch.tick(player);
         // CharmOfSinkingPolymerPatch.tick(player); // TODO
         CloudInABottlePolymerPatch.tick(player);
+        HeliumFlamingoPolymerPatch.tick(player);
         SnowshoesPolymerPatch.tick(player);
         SteadfastSpikesPolymerPatch.tick(player);
         StriderShoesPolymerPatch.tick(player);
