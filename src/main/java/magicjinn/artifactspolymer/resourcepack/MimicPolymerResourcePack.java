@@ -128,9 +128,9 @@ public final class MimicPolymerResourcePack {
      */
     private static byte[] readClasspath(String path) {
         try (InputStream in = MimicPolymerResourcePack.class.getClassLoader().getResourceAsStream(path)) {
-            if (in == null) {
+            if (in == null)
                 return null;
-            }
+
             return in.readAllBytes();
         } catch (IOException e) {
             return null;

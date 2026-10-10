@@ -70,8 +70,6 @@ public class ResourcePackSetup {
         // Rewrite to remove the property.
         resource = stripNeedsRepairItemModels(path, resource);
 
-        // resource = fixHeldCuboidModelTextures(path, resource);
-
         resource = patchUmbrellaHeldDisplays(path, resource);
 
         return resource;
@@ -99,8 +97,7 @@ public class ResourcePackSetup {
                     "\"thirdperson_lefthand\": {\n      \"rotation\": [0, 0, 0],\n      \"translation\": [0, 0, 2]\n    }",
                     "\"thirdperson_lefthand\": {\n      \"rotation\": [45, 180, 0],\n      \"translation\": [0, 8, 2]\n    }");
             return PackResource.fromString(content);
-        }
-        if ("umbrella_held_blocking.json".equals(fileName)) {
+        } else if ("umbrella_held_blocking.json".equals(fileName)) {
             content = content.replace("\"rotation\": [-90, 22.5, 0]", "\"rotation\": [90, 22.5, -90]");
             return PackResource.fromString(content);
         }

@@ -6,6 +6,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import magicjinn.artifactspolymer.polymer.AquaDashersPolymerPatch;
+import magicjinn.artifactspolymer.polymer.CloudInABottlePolymerPatch;
+import magicjinn.artifactspolymer.polymer.SnowshoesPolymerPatch;
+import magicjinn.artifactspolymer.polymer.SteadfastSpikesPolymerPatch;
+import magicjinn.artifactspolymer.polymer.StriderShoesPolymerPatch;
 import net.minecraft.server.level.ServerPlayer;
 
 @Mixin(ServerPlayer.class)
@@ -17,5 +21,10 @@ public class ServerPlayerMixin {
         ServerPlayer player = (ServerPlayer) (Object) this;
 
         AquaDashersPolymerPatch.tick(player);
+        // CharmOfSinkingPolymerPatch.tick(player); // TODO
+        CloudInABottlePolymerPatch.tick(player);
+        SnowshoesPolymerPatch.tick(player);
+        SteadfastSpikesPolymerPatch.tick(player);
+        StriderShoesPolymerPatch.tick(player);
     }
 }

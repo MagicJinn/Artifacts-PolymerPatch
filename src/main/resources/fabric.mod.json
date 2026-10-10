@@ -29,6 +29,7 @@
 		"fabric-api": "*",
 		"artifacts": ">=15.1.3",
 		"polymer-core": "*",
+		"polymer-blocks": "*",
 		"polymer-resource-pack": "*",
 		"polymer-virtual-entity": "*",
 		"factorytools": "*",
