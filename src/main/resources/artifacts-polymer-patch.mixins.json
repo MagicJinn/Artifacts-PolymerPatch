@@ -5,7 +5,8 @@
 	"mixins": [
 		"FabricRegisterMixin",
 		"ServerPlayerMixin",
-		"ServerPlayerGameModeMixin"
+		"ServerPlayerGameModeMixin",
+		"EnderpearlItemWarpDriveMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
