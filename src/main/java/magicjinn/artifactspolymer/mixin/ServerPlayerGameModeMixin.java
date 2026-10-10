@@ -7,6 +7,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import artifacts.registry.ModDataComponents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -15,8 +16,8 @@ import magicjinn.artifactspolymer.polymer.PolymerClientChecks;
 import net.minecraft.world.level.block.state.BlockState;
 
 // POLYMER WORKAROUND: Vanilla clients gate STOP_DESTROY_BLOCK on local mining math. Server tick ignores
-// incrementDestroyProgress's return value. Finish the break when server progress hits 1 for Polymer clients
-// so digging claws speed / tool-tier bonuses actually apply.
+// incrementDestroyProgress's return value. When Digging Claws are equipped, finish the break when server
+// progress hits 1 so their speed / tool-tier bonuses actually apply for Polymer clients.
 @Mixin(ServerPlayerGameMode.class)
 public abstract class ServerPlayerGameModeMixin {
     @Shadow
@@ -57,9 +58,12 @@ public abstract class ServerPlayerGameModeMixin {
     }
 
     private static boolean shouldFinishDestroy(ServerPlayer player, BlockState state, BlockPos pos, int elapsedTicks) {
-        if (!PolymerClientChecks.lacksArtifactsClient(player) || state.isAir()) {
+        if (!PolymerClientChecks.lacksArtifactsClient(player) || state.isAir())
             return false;
-        }
+
+        if (!ModDataComponents.TOOL_TIER_UPGRADE.on(player).findAny())
+            return false;
+
         float progress = state.getDestroyProgress(player, player.level(), pos) * (elapsedTicks + 1);
         return progress >= 1.0F;
     }

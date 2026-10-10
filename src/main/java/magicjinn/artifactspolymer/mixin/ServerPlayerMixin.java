@@ -28,5 +28,6 @@ public class ServerPlayerMixin {
         SnowshoesPolymerPatch.tick(player);
         SteadfastSpikesPolymerPatch.tick(player);
         StriderShoesPolymerPatch.tick(player);
+        // SwimSpeedPolymerSupport.tick(player); // TODO
     }
 }
