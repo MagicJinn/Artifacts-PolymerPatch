@@ -69,6 +69,8 @@ public final class HeliumFlamingoPolymerPatch {
         Vec3 lastPos;
         int lastBubblePop;
         boolean selfScaleActive;
+        /** True only while Polymer is forcing air-swim pose / motion. */
+        boolean airSwimActive;
     }
 
     private static PlayerState state(ServerPlayer player) {
@@ -189,7 +191,10 @@ public final class HeliumFlamingoPolymerPatch {
 
     private static void maintainAirSwim(ServerPlayer player, SwimData swimData) {
         if (!swimData.isSwimFlying() || player.onGround()) {
-            clearFlight(player);
+            // Only tear down when we were air-swimming. Clearing every idle tick
+            // forced Pose.STANDING and broke real water swimming (e.g. under ice).
+            if (state(player).airSwimActive)
+                clearFlight(player);
             return;
         }
 
@@ -215,6 +220,7 @@ public final class HeliumFlamingoPolymerPatch {
         // ExpandAbility already ran fluid travel this tick (sneak = ~4.5 b/s down).
         // Rewind to last flamingo pos and apply our motion so Polymer owns movement.
         PlayerState state = state(player);
+        state.airSwimActive = true;
         Vec3 origin = state.lastPos != null ? state.lastPos : player.position();
         player.setPos(origin.x, origin.y, origin.z);
         player.setDeltaMovement(motion);
@@ -317,14 +323,19 @@ public final class HeliumFlamingoPolymerPatch {
             gravity.removeModifier(NO_GRAVITY_ID);
 
         PlayerState state = STATES.get(player.getUUID());
+        boolean wasAirSwim = state != null && state.airSwimActive;
         if (state != null && state.selfScaleActive)
             sendSelfScaleOverride(player, false);
 
-        player.setSwimming(false);
-        if (player.getPose() == Pose.SWIMMING)
-            player.setPose(Pose.STANDING);
+        // Don't force standing in water. Vanilla swim pose must stay under ice etc.
+        if (wasAirSwim && !player.isInWater()) {
+            player.setSwimming(false);
+            if (player.getPose() == Pose.SWIMMING)
+                player.setPose(Pose.STANDING);
+        }
 
         if (state != null) {
+            state.airSwimActive = false;
             state.lastPos = null;
             state.lastBubblePop = 0;
         }
