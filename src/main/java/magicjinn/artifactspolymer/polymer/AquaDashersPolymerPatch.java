@@ -43,6 +43,10 @@ public class AquaDashersPolymerPatch {
         FOOTING.clear(oldPlayer);
     }
 
+    public static void clearAll() {
+        FOOTING.clearAll();
+    }
+
     private static boolean canOverlay(BlockState state) {
         if (state.is(Blocks.WATER))
             return true;

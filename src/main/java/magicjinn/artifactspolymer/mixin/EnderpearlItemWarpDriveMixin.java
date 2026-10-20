@@ -1,17 +1,19 @@
 package magicjinn.artifactspolymer.mixin;
 
+import artifacts.registry.ModDataComponents;
+import artifacts.registry.ModItems;
+import eu.pb4.polymer.core.api.utils.PolymerUtils;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.EnderpearlItem;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import eu.pb4.polymer.core.api.utils.PolymerUtils;
 
 @Mixin(EnderpearlItem.class)
 public abstract class EnderpearlItemWarpDriveMixin {
@@ -28,6 +30,26 @@ public abstract class EnderpearlItemWarpDriveMixin {
         if (result == null || !result.consumesAction())
             return;
 
+        if (!hasWarpDrive(serverPlayer))
+            return;
+
         PolymerUtils.reloadInventory(serverPlayer);
+    }
+
+    /**
+     * Equipped Warp Drive (trinket / ability slot) or sitting in the player
+     * inventory. Equipped is what skips pearl consume. Inventory covers a loose
+     * item the player might equip mid-stack.
+     */
+    private static boolean hasWarpDrive(ServerPlayer player) {
+        if (ModDataComponents.ENDER_PEARL_HUNGER_COST.on(player).findAny())
+            return true;
+
+        for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
+            ItemStack stack = player.getInventory().getItem(i);
+            if (stack.is(ModItems.WARP_DRIVE))
+                return true;
+        }
+        return false;
     }
 }

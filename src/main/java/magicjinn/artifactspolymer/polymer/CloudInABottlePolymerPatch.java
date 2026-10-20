@@ -58,6 +58,10 @@ public final class CloudInABottlePolymerPatch {
         clear(oldPlayer);
     }
 
+    public static void clearAll() {
+        STATES.clear();
+    }
+
     private static boolean isGroundedForDoubleJump(ServerPlayer player) {
         if (!(player.onGround() || player.onClimbable()))
             return false;
@@ -71,18 +75,16 @@ public final class CloudInABottlePolymerPatch {
         return ModDataComponents.SINKING.on(player).findAny();
     }
 
-    // Particle spawn code is identical to Artifacts' method
     private static void spawnParticles(ServerPlayer player) {
         ParticleOptions particle = player.isInWater() ? ParticleTypes.BUBBLE : ParticleTypes.POOF;
-        for (int i = 0; i < 20; i++) {
-            double motionX = player.getRandom().nextGaussian() * 0.02;
-            double motionY = player.getRandom().nextGaussian() * 0.02 + 0.20;
-            double motionZ = player.getRandom().nextGaussian() * 0.02;
-            player.level().sendParticles(particle,
-                    player.getX(), player.getY(), player.getZ(),
-                    1,
-                    motionX, motionY, motionZ,
-                    0.15);
-        }
+        // One packet with count 20
+        // In the original mod, the particles are spawned on the client, meaning they
+        // can get away with spawning them separately. But on the server, to avoid
+        // packet spam, we need to spawn them all at once.
+        player.level().sendParticles(particle,
+                player.getX(), player.getY(), player.getZ(),
+                20,
+                0.2, 0.2, 0.2,
+                0.15);
     }
 }

@@ -37,8 +37,6 @@ public final class CharmOfSinkingPolymerPatch {
     private static final Identifier WME_ID = ArtifactsPolymerPatch.id("polymer_sinking_wme");
     private static final Identifier GRAV_ID = ArtifactsPolymerPatch.id("polymer_sinking_grav");
     private static final double STEP_TARGET = 1.0;
-    private static final double WME_DRAG_TARGET = 0.54600006;
-    private static final double BASE_SWIM_ACCEL = 0.02;
     /**
      * Vanilla land walk / sprint blocks-per-second targets for water-terminal
      * calibration.
@@ -82,17 +80,21 @@ public final class CharmOfSinkingPolymerPatch {
         clear(oldPlayer);
     }
 
+    public static void clearAll() {
+        ACTIVE.clear();
+    }
+
     private static Spoof computeSpoof(ServerPlayer player) {
         boolean swimmingPath = !player.onGround();
         double groundFactor = swimmingPath ? 0.5 : 1.0;
         double e = groundFactor; // WME packet = 1.0
-        double d0 = player.isSprinting() ? 0.9 : 0.8;
-        double d = d0 + (WME_DRAG_TARGET - d0) * e;
+        double d0 = SwimSpoofMath.baseWaterDrag(player.isSprinting());
+        double d = SwimSpoofMath.waterDrag(d0, e);
         double targetV = (player.isSprinting() ? SPRINT_BPS : WALK_BPS) / 20.0;
         double a = targetV * (1.0 - d) / Math.max(1e-6, d);
         double ms = e <= 1e-6
                 ? targetV
-                : BASE_SWIM_ACCEL + (a - BASE_SWIM_ACCEL) / e;
+                : SwimSpoofMath.BASE_SWIM_ACCEL + (a - SwimSpoofMath.BASE_SWIM_ACCEL) / e;
         return new Spoof(1.0, Mth.clamp(ms, 0.0, 1024.0), GRAVITY_TARGET);
     }
 

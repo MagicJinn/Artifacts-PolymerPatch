@@ -70,16 +70,9 @@ public abstract class ServerPlayerGameModeMixin {
         artifactsPolymer$destroyTrackingPos = null;
         isDestroyingBlock = false;
         lastSentState = -1;
-        finishDestroy((ServerPlayerGameMode) (Object) this, player, level, destroyPos);
-    }
-
-    /** Finish the destroy block serverside */
-    private static void finishDestroy(
-            ServerPlayerGameMode gameMode,
-            ServerPlayer player,
-            ServerLevel level,
-            BlockPos pos) {
-        level.destroyBlockProgress(player.getId(), pos, -1);
-        gameMode.destroyBlock(pos);
+        // Same path as vanilla STOP_DESTROY_BLOCK. destroyAndAck resyncs the
+        // client block if destroyBlock returns false (adventure / GameMaster / etc).
+        level.destroyBlockProgress(player.getId(), destroyPos, -1);
+        ((ServerPlayerGameMode) (Object) this).destroyAndAck(destroyPos, 0, "artifacts digging claws");
     }
 }

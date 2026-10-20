@@ -14,19 +14,16 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.network.protocol.game.ClientboundUpdateAttributesPacket;
 import net.minecraft.resources.Identifier;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.BossEvent;
-import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Input;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
 /**
@@ -58,14 +55,13 @@ public final class HeliumFlamingoPolymerPatch {
     /** Active swim up/down with jump/shift (~4.5 blocks/s). */
     private static final double VERTICAL_SWIM_PER_TICK = 4.5 / 20.0;
 
-    /** Drop lastPos if the player jumped farther than flamingo motion allows. */
-    private static final double TELEPORT_DIST_SQR = 4.0;
-
     private static final Identifier NO_GRAVITY_ID = ArtifactsPolymerPatch.id("helium_flamingo_no_gravity");
 
     /**
-     * POLYMER WORKAROUND: Self-only SCALE (×1/3) so the flyer's own client gets a swim-sized hitbox.
-     * Not applied on the server entity. Other players will see the player swimming instead.
+     * POLYMER WORKAROUND: Self-only SCALE (×1/3) so the flyer's own client gets a
+     * swim-sized hitbox. Pose.SWIMMING shrinks the server entity, but a vanilla
+     * client still predicts a standing self-hitbox in air. Not applied on the
+     * server entity. Other players see Pose.SWIMMING instead.
      */
     private static final Identifier SELF_SWIM_SCALE_ID = ArtifactsPolymerPatch.id("helium_flamingo_self_swim_scale");
 
@@ -74,8 +70,6 @@ public final class HeliumFlamingoPolymerPatch {
     private static final class PlayerState {
         ServerBossEvent chargeBar;
         boolean wasSprint;
-        Vec3 lastPos;
-        ResourceKey<Level> lastDimension;
         int lastBubblePop;
         boolean selfScaleActive;
         /** True only while Polymer is forcing air-swim pose / motion. */
@@ -106,7 +100,7 @@ public final class HeliumFlamingoPolymerPatch {
     }
 
     public static void onDisconnect(ServerPlayer player) {
-        clearAll(player);
+        clearPlayer(player);
         STATES.remove(player.getUUID());
     }
 
@@ -115,7 +109,17 @@ public final class HeliumFlamingoPolymerPatch {
         onDisconnect(oldPlayer);
     }
 
-    private static void clearAll(ServerPlayer player) {
+    public static void clearAll() {
+        for (PlayerState state : STATES.values()) {
+            if (state.chargeBar != null) {
+                state.chargeBar.setVisible(false);
+                state.chargeBar = null;
+            }
+        }
+        STATES.clear();
+    }
+
+    private static void clearPlayer(ServerPlayer player) {
         resetSprintAndFlight(player);
         removeChargeBossBar(player);
     }
@@ -228,11 +232,12 @@ public final class HeliumFlamingoPolymerPatch {
         }
 
         applyNoGravity(player);
-        // Server + other clients see Pose.SWIMMING
-        // Affected client gets SCALE packet so their standing self-view is swim-sized.
+        // Server + other clients see Pose.SWIMMING. Own client gets SCALE so its
+        // standing self-view is swim-sized.
         player.setSwimming(true);
         player.setPose(Pose.SWIMMING);
         sendSelfScaleOverride(player, true);
+        state(player).airSwimActive = true;
 
         Input input = player.getLastClientInput();
         Vec3 motion;
@@ -246,22 +251,9 @@ public final class HeliumFlamingoPolymerPatch {
             motion = new Vec3(0.0, -SINK_SPEED_PER_TICK, 0.0);
         }
 
-        // ExpandAbility already ran fluid travel this tick (sneak = ~4.5 b/s down).
-        // Rewind to last flamingo pos and apply our motion so Polymer owns movement.
-        PlayerState state = state(player);
-        state.airSwimActive = true;
-        Vec3 current = player.position();
-        ResourceKey<Level> dimension = player.level().dimension();
-        if (state.lastPos != null
-                && (state.lastDimension != dimension || state.lastPos.distanceToSqr(current) > TELEPORT_DIST_SQR)) {
-            state.lastPos = null;
-        }
-        Vec3 origin = state.lastPos != null ? state.lastPos : current;
-        player.setPos(origin.x, origin.y, origin.z);
+        // Client-authoritative position. Push swim-like velocity only. Do not
+        // rewind/setPos or server-move. The client reports position as usual.
         player.setDeltaMovement(motion);
-        player.move(MoverType.SELF, motion);
-        state.lastPos = player.position();
-        state.lastDimension = dimension;
         player.connection.send(new ClientboundSetEntityMotionPacket(player));
     }
 
@@ -372,8 +364,6 @@ public final class HeliumFlamingoPolymerPatch {
 
         if (state != null) {
             state.airSwimActive = false;
-            state.lastPos = null;
-            state.lastDimension = null;
             state.lastBubblePop = 0;
         }
     }

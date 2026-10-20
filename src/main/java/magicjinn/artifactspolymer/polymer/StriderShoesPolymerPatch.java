@@ -41,6 +41,10 @@ public class StriderShoesPolymerPatch {
         FOOTING.clear(oldPlayer);
     }
 
+    public static void clearAll() {
+        FOOTING.clearAll();
+    }
+
     private static boolean canOverlay(BlockState state) {
         if (state.is(Blocks.LAVA) || state.isAir())
             return true;

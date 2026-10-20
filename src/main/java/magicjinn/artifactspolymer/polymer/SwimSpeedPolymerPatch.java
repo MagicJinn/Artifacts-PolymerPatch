@@ -31,9 +31,6 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
  */
 public final class SwimSpeedPolymerPatch {
     // WHOOOOOLE lot of Magic Numbers here.
-    private static final double BASE_SWIM_ACCEL = 0.02;
-    /** Vanilla travelInWater lerps water drag toward this as WME rises. */
-    private static final double WME_DRAG_TARGET = 0.54600006;
     /**
      * Minimal effective WME so movement_speed participates in swim accel. Keep
      * this small so drag stays close to vanilla (Artifacts does not reduce drag).
@@ -100,6 +97,11 @@ public final class SwimSpeedPolymerPatch {
         clear(oldPlayer);
     }
 
+    public static void clearAll() {
+        ACTIVE.clear();
+        WATER_GRACE.clear();
+    }
+
     private static void clear(ServerPlayer player) {
         WATER_GRACE.remove(player.getUUID());
         if (!ACTIVE.remove(player.getUUID()))
@@ -117,26 +119,27 @@ public final class SwimSpeedPolymerPatch {
         boolean swimmingPath = player.isSwimming() || !player.onGround();
         double groundFactor = swimmingPath ? 0.5 : 1.0;
         double eReal = realWme * groundFactor;
-        double d0 = player.isSprinting() ? 0.9 : 0.8;
+        double d0 = SwimSpoofMath.baseWaterDrag(player.isSprinting());
 
         // SPOOF_BONUS_SCALE is calibrated for mid-water swim (else we overshoot).
         // Seafloor walk needs the full swim_speed multiply (1.96 > 3.33 at +70%).
         double bonusScale = swimmingPath ? SPOOF_BONUS_SCALE : 1.0;
         double effectiveSwimSpeed = 1.0 + (swimSpeed - 1.0) * bonusScale;
-        double aArtifacts = (BASE_SWIM_ACCEL + (realMs - BASE_SWIM_ACCEL) * eReal) * effectiveSwimSpeed;
-        double dArtifacts = d0 + (WME_DRAG_TARGET - d0) * eReal;
+        double aArtifacts = (SwimSpoofMath.BASE_SWIM_ACCEL
+                + (realMs - SwimSpoofMath.BASE_SWIM_ACCEL) * eReal) * effectiveSwimSpeed;
+        double dArtifacts = SwimSpoofMath.waterDrag(d0, eReal);
 
         double eClient = eReal > 1e-4 ? eReal : E_BOOST;
         double wmeClient = Mth.clamp(eClient / groundFactor, 0.0, 1.0);
         eClient = wmeClient * groundFactor;
 
         double vArtifacts = aArtifacts * dArtifacts / Math.max(1e-6, 1.0 - dArtifacts);
-        double dClient = d0 + (WME_DRAG_TARGET - d0) * eClient;
+        double dClient = SwimSpoofMath.waterDrag(d0, eClient);
         double aClient = vArtifacts * (1.0 - dClient) / Math.max(1e-6, dClient);
 
         double msNeeded = eClient <= 1e-6
                 ? realMs
-                : BASE_SWIM_ACCEL + (aClient - BASE_SWIM_ACCEL) / eClient;
+                : SwimSpoofMath.BASE_SWIM_ACCEL + (aClient - SwimSpoofMath.BASE_SWIM_ACCEL) / eClient;
         msNeeded = Mth.clamp(msNeeded, 0.0, 1024.0);
 
         return new Spoof(wmeClient, msNeeded);

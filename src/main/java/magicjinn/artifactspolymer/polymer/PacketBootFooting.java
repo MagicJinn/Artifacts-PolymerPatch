@@ -19,12 +19,20 @@ import net.minecraft.world.level.block.state.BlockState;
  * solid BlockUpdate packets under the player without changing the real world.
  */
 public final class PacketBootFooting {
+    /**
+     * Re-push the full fake set this often so a client dig/update cannot leave
+     * the real fluid/ice visible for long. New/removed positions still sync
+     * every tick.
+     */
+    private static final int FULL_REFRESH_INTERVAL = 10;
+
     @FunctionalInterface
     public interface FakeState {
         BlockState get(ServerPlayer player, BlockPos pos);
     }
 
     private final Map<UUID, Set<BlockPos>> active = new HashMap<>();
+    private final Map<UUID, Integer> ticksSinceFullRefresh = new HashMap<>();
     private final FakeState fakeState;
 
     public PacketBootFooting(BlockState fakeState) {
@@ -41,18 +49,22 @@ public final class PacketBootFooting {
             return;
         }
 
-        Set<BlockPos> previous = active.getOrDefault(player.getUUID(), Set.of());
+        UUID id = player.getUUID();
+        Set<BlockPos> previous = active.getOrDefault(id, Set.of());
         for (BlockPos pos : previous) {
             if (!target.contains(pos))
                 sendRealBlock(player, pos);
         }
-        // POLYMER WORKAROUND: Resend every tick so clicks / client block updates
-        // cannot restore the real fluid/ice underneath.
+
+        int age = ticksSinceFullRefresh.getOrDefault(id, FULL_REFRESH_INTERVAL);
+        boolean fullRefresh = age >= FULL_REFRESH_INTERVAL;
         for (BlockPos pos : target) {
-            sendFakeFooting(player, pos);
+            if (fullRefresh || !previous.contains(pos))
+                sendFakeFooting(player, pos);
         }
 
-        active.put(player.getUUID(), new HashSet<>(target));
+        ticksSinceFullRefresh.put(id, fullRefresh ? 0 : age + 1);
+        active.put(id, new HashSet<>(target));
     }
 
     public void onDisconnect(ServerPlayer player) {
@@ -63,13 +75,23 @@ public final class PacketBootFooting {
 
     /** Tear down fake footing (unequip, disconnect, respawn). */
     public void clear(ServerPlayer player) {
-        Set<BlockPos> previous = active.remove(player.getUUID());
+        UUID id = player.getUUID();
+        ticksSinceFullRefresh.remove(id);
+        Set<BlockPos> previous = active.remove(id);
         if (previous == null)
             return;
 
         for (BlockPos pos : previous) {
             sendRealBlock(player, pos);
         }
+    }
+
+    /**
+     * Drop all players (server stop).
+     */
+    public void clearAll() {
+        active.clear();
+        ticksSinceFullRefresh.clear();
     }
 
     public static Set<BlockPos> footprint(ServerLevel level, BlockPos center, int horizontalRadius,
@@ -82,7 +104,7 @@ public final class PacketBootFooting {
             for (int dz = -horizontalRadius; dz <= horizontalRadius; dz++) {
                 BlockPos pos = center.offset(dx, 0, dz);
                 if (canOverlay.test(level.getBlockState(pos)))
-                    positions.add(pos.immutable());
+                    positions.add(pos);
             }
         }
         return positions;

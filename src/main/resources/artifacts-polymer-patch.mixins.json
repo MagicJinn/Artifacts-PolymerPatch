@@ -8,7 +8,7 @@
 		"ServerPlayerGameModeMixin",
 		"EnderpearlItemWarpDriveMixin",
 		"SwimInAirTooltipMixin",
-		"TooltipHelperMixin",
+		"ToggleKeyHandlersMixin",
 		"EquipmentSlotManagerMixin",
 		"TrinketUtilitiesMixin",
 		"SwimDataMixin"

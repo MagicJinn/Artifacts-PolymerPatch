@@ -2,6 +2,7 @@ package magicjinn.artifactspolymer;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ClientboundPlayChannelEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -64,27 +65,16 @@ public class ArtifactsPolymerPatch implements ModInitializer {
 		});
 
 		ServerPlayConnectionEvents.DISCONNECT.register((listener, server) -> {
-			AquaDashersPolymerPatch.onDisconnect(listener.player);
-			CharmOfSinkingPolymerPatch.onDisconnect(listener.player);
-			StriderShoesPolymerPatch.onDisconnect(listener.player);
-			SnowshoesPolymerPatch.onDisconnect(listener.player);
-			SteadfastSpikesPolymerPatch.onDisconnect(listener.player);
-			CloudInABottlePolymerPatch.onDisconnect(listener.player);
-			HeliumFlamingoPolymerPatch.onDisconnect(listener.player);
-			SwimSpeedPolymerPatch.onDisconnect(listener.player);
+			clearPlayerState(listener.player);
 		});
 
 		ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) -> {
-			AquaDashersPolymerPatch.onRespawn(oldPlayer);
-			CharmOfSinkingPolymerPatch.onRespawn(oldPlayer);
-			StriderShoesPolymerPatch.onRespawn(oldPlayer);
-			SnowshoesPolymerPatch.onRespawn(oldPlayer);
-			SteadfastSpikesPolymerPatch.onRespawn(oldPlayer);
-			CloudInABottlePolymerPatch.onRespawn(oldPlayer);
-			HeliumFlamingoPolymerPatch.onRespawn(oldPlayer);
-			SwimSpeedPolymerPatch.onRespawn(oldPlayer);
+			clearPlayerStateOnRespawn(oldPlayer);
 		});
 
+		// Integrated server keeps the JVM across world loads. Drop static maps so
+		// boss bars / footing / spoof state cannot leak into the next world.
+		ServerLifecycleEvents.SERVER_STOPPED.register(server -> clearAllPlayerState());
 	}
 
 	/** Artifacts registers UpdateConfigValuePacket only with its client mod. */
@@ -95,6 +85,47 @@ public class ArtifactsPolymerPatch implements ModInitializer {
 		LOGGER.info("Kicking {}: Artifacts client is not allowed on this Polymer server",
 				player.getGameProfile().name());
 		player.connection.disconnect(ARTIFACTS_CLIENT_KICK);
+	}
+
+	private static void clearPlayerState(ServerPlayer player) {
+		safeCleanup("aqua_dashers", () -> AquaDashersPolymerPatch.onDisconnect(player));
+		safeCleanup("charm_of_sinking", () -> CharmOfSinkingPolymerPatch.onDisconnect(player));
+		safeCleanup("strider_shoes", () -> StriderShoesPolymerPatch.onDisconnect(player));
+		safeCleanup("snowshoes", () -> SnowshoesPolymerPatch.onDisconnect(player));
+		safeCleanup("steadfast_spikes", () -> SteadfastSpikesPolymerPatch.onDisconnect(player));
+		safeCleanup("cloud_in_a_bottle", () -> CloudInABottlePolymerPatch.onDisconnect(player));
+		safeCleanup("helium_flamingo", () -> HeliumFlamingoPolymerPatch.onDisconnect(player));
+		safeCleanup("swim_speed", () -> SwimSpeedPolymerPatch.onDisconnect(player));
+	}
+
+	private static void clearPlayerStateOnRespawn(ServerPlayer oldPlayer) {
+		safeCleanup("aqua_dashers", () -> AquaDashersPolymerPatch.onRespawn(oldPlayer));
+		safeCleanup("charm_of_sinking", () -> CharmOfSinkingPolymerPatch.onRespawn(oldPlayer));
+		safeCleanup("strider_shoes", () -> StriderShoesPolymerPatch.onRespawn(oldPlayer));
+		safeCleanup("snowshoes", () -> SnowshoesPolymerPatch.onRespawn(oldPlayer));
+		safeCleanup("steadfast_spikes", () -> SteadfastSpikesPolymerPatch.onRespawn(oldPlayer));
+		safeCleanup("cloud_in_a_bottle", () -> CloudInABottlePolymerPatch.onRespawn(oldPlayer));
+		safeCleanup("helium_flamingo", () -> HeliumFlamingoPolymerPatch.onRespawn(oldPlayer));
+		safeCleanup("swim_speed", () -> SwimSpeedPolymerPatch.onRespawn(oldPlayer));
+	}
+
+	private static void clearAllPlayerState() {
+		safeCleanup("aqua_dashers", AquaDashersPolymerPatch::clearAll);
+		safeCleanup("charm_of_sinking", CharmOfSinkingPolymerPatch::clearAll);
+		safeCleanup("strider_shoes", StriderShoesPolymerPatch::clearAll);
+		safeCleanup("snowshoes", SnowshoesPolymerPatch::clearAll);
+		safeCleanup("steadfast_spikes", SteadfastSpikesPolymerPatch::clearAll);
+		safeCleanup("cloud_in_a_bottle", CloudInABottlePolymerPatch::clearAll);
+		safeCleanup("helium_flamingo", HeliumFlamingoPolymerPatch::clearAll);
+		safeCleanup("swim_speed", SwimSpeedPolymerPatch::clearAll);
+	}
+
+	private static void safeCleanup(String name, Runnable cleanup) {
+		try {
+			cleanup.run();
+		} catch (Throwable t) {
+			LOGGER.error("Polymer patch cleanup failed: {}", name, t);
+		}
 	}
 
 	public static Identifier id(String path) {
