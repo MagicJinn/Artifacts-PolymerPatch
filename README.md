@@ -46,6 +46,6 @@ Artifacts expects its client mod for a handful of things. This patch fakes them 
 
 ## Good to know
 
-- **Worn artifacts are invisible** on the player model; the item in your hand and inventory is fine.
+- **Worn artifacts are invisible** on the player model. The item in your hand and inventory is fine.
 - **The Artifacts config screen and toggle key are client-only**, so vanilla players can't use them.
 - Abilities run server-side, so some client-side feedback may be missing or look a little different.
