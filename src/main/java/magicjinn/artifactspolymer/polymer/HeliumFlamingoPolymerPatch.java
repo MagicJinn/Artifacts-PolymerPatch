@@ -41,6 +41,9 @@ public final class HeliumFlamingoPolymerPatch {
 
     private static final int NUM_AIR_BUBBLES = 10;
 
+    private static final String CHARGE_ICON = "🦩";
+    private static final String EMPTY_ICON = "_";
+
     private static final Component NAME_CHARGE = Component.literal("Helium Flamingo");
 
     /**
@@ -84,13 +87,6 @@ public final class HeliumFlamingoPolymerPatch {
     }
 
     public static void tick(ServerPlayer player) {
-        // Polymer boss bar / air-swim only for vanilla clients. Artifacts clients
-        // already have the Helium HUD and flight handling.
-        if (!PolymerClientChecks.lacksArtifactsClient(player)) {
-            clearAll(player);
-            return;
-        }
-
         updateBossBar(player);
 
         if (!ModDataComponents.SWIM_IN_AIR.on(player).findAny()) {
@@ -153,10 +149,7 @@ public final class HeliumFlamingoPolymerPatch {
             return;
         }
 
-        float cooldownSec = remainingCooldownSeconds(player);
-        Component name = cooldownSec > 0.05f
-                ? Component.literal("Helium Flamingo (cooldown " + String.format("%.1f", cooldownSec) + "s)")
-                : NAME_CHARGE;
+        Component name = chargeBarName(charge, remainingCooldownSeconds(player));
 
         PlayerState state = state(player);
         if (state.chargeBar == null) {
@@ -174,6 +167,16 @@ public final class HeliumFlamingoPolymerPatch {
         state.chargeBar.setName(name);
         // Round to nearest 10% to avoid jitter on clients.
         state.chargeBar.setProgress((float) Mth.roundToward((int) (charge * 100), 10) / 100.0f);
+    }
+
+    private static Component chargeBarName(float charge, float cooldownSec) {
+        if (cooldownSec > 0.05f)
+            return Component.literal(String.format("Helium Flamingo (cooldown %.1fs)", cooldownSec));
+
+        StringBuilder icons = new StringBuilder(1 + NUM_AIR_BUBBLES).append(' ');
+        for (int i = 0; i < NUM_AIR_BUBBLES; i++)
+            icons.append(i < charge * NUM_AIR_BUBBLES ? CHARGE_ICON : EMPTY_ICON);
+        return NAME_CHARGE.copy().append(Component.literal(icons.toString()));
     }
 
     /** Remaining Helium Flamingo item cooldown in seconds (mid-air cancel). */

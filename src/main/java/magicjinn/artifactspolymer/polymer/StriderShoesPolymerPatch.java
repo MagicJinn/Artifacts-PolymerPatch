@@ -37,6 +37,10 @@ public class StriderShoesPolymerPatch {
         FOOTING.onDisconnect(player);
     }
 
+    public static void onRespawn(ServerPlayer oldPlayer) {
+        FOOTING.clear(oldPlayer);
+    }
+
     private static boolean canOverlay(BlockState state) {
         if (state.is(Blocks.LAVA) || state.isAir())
             return true;

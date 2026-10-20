@@ -30,6 +30,10 @@ public class SnowshoesPolymerPatch {
         FOOTING.onDisconnect(player);
     }
 
+    public static void onRespawn(ServerPlayer oldPlayer) {
+        FOOTING.clear(oldPlayer);
+    }
+
     private static BlockPos powderSnowCenter(Player player) {
         BlockPos pos = BlockPos.containing(player.getX(), player.getY() - 0.2, player.getZ());
         if (canOverlay(player.level().getBlockState(pos)))

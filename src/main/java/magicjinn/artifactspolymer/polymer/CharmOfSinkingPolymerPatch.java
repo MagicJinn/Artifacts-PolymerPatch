@@ -51,10 +51,6 @@ public final class CharmOfSinkingPolymerPatch {
     private static final Set<UUID> ACTIVE = new HashSet<>();
 
     public static void tick(ServerPlayer player) {
-        if (!PolymerClientChecks.lacksArtifactsClient(player)) {
-            clear(player);
-            return;
-        }
         if (!ModDataComponents.SINKING.on(player).findAny()) {
             clear(player);
             return;
@@ -80,6 +76,10 @@ public final class CharmOfSinkingPolymerPatch {
 
     public static void onDisconnect(ServerPlayer player) {
         clear(player);
+    }
+
+    public static void onRespawn(ServerPlayer oldPlayer) {
+        clear(oldPlayer);
     }
 
     private static Spoof computeSpoof(ServerPlayer player) {

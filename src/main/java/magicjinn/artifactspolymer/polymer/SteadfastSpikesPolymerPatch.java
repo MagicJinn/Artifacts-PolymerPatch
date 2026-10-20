@@ -32,6 +32,10 @@ public class SteadfastSpikesPolymerPatch {
         FOOTING.onDisconnect(player);
     }
 
+    public static void onRespawn(ServerPlayer oldPlayer) {
+        FOOTING.clear(oldPlayer);
+    }
+
     private static BlockPos iceCenter(Player player) {
         BlockPos pos = player.getOnPos();
         if (canOverlay(player.level().getBlockState(pos)))

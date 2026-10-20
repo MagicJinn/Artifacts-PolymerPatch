@@ -4,13 +4,20 @@ import artifacts.network.payload.UpdateConfigValuePacket;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.server.level.ServerPlayer;
 
+/**
+ * Detects whether a player has the Artifacts client mod. This patch is
+ * Polymer / vanilla-client only. Artifacts clients are kicked on join.
+ */
 public final class PolymerClientChecks {
     private PolymerClientChecks() {
     }
 
-    // POLYMER WORKAROUND: Artifacts registers UpdateConfigValuePacket only when its
-    // client mod is present. Use canSend to check for the client mod.
+    // Artifacts registers UpdateConfigValuePacket only when its client mod is present.
     public static boolean lacksArtifactsClient(ServerPlayer player) {
         return !ServerPlayNetworking.canSend(player, UpdateConfigValuePacket.TYPE);
+    }
+
+    public static boolean hasArtifactsClient(ServerPlayer player) {
+        return !lacksArtifactsClient(player);
     }
 }

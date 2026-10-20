@@ -54,11 +54,6 @@ public final class SwimSpeedPolymerPatch {
     private static final Map<UUID, Integer> WATER_GRACE = new HashMap<>();
 
     public static void tick(ServerPlayer player) {
-        if (!PolymerClientChecks.lacksArtifactsClient(player)) {
-            clear(player);
-            return;
-        }
-
         if (!player.getAttributes().hasAttribute(ModAttributes.SWIM_SPEED)) {
             clear(player);
             return;
@@ -98,8 +93,11 @@ public final class SwimSpeedPolymerPatch {
     }
 
     public static void onDisconnect(ServerPlayer player) {
-        ACTIVE.remove(player.getUUID());
-        WATER_GRACE.remove(player.getUUID());
+        clear(player);
+    }
+
+    public static void onRespawn(ServerPlayer oldPlayer) {
+        clear(oldPlayer);
     }
 
     private static void clear(ServerPlayer player) {

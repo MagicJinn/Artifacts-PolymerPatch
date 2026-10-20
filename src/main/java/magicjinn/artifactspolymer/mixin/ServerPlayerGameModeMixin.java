@@ -13,7 +13,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ServerPlayerGameMode;
-import magicjinn.artifactspolymer.polymer.PolymerClientChecks;
 import net.minecraft.world.level.block.state.BlockState;
 
 // POLYMER WORKAROUND: Vanilla clients gate STOP_DESTROY_BLOCK on local mining math. Server tick ignores
@@ -50,9 +49,6 @@ public abstract class ServerPlayerGameModeMixin {
             artifactsPolymer$destroyTrackingPos = null;
             return;
         }
-
-        if (!PolymerClientChecks.lacksArtifactsClient(player))
-            return;
 
         if (!ModDataComponents.TOOL_TIER_UPGRADE.on(player).findAny())
             return;

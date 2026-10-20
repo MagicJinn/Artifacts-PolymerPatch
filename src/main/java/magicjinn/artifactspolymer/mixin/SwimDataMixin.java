@@ -7,7 +7,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import artifacts.component.SwimData;
 import magicjinn.artifactspolymer.polymer.CharmOfSinkingPolymerPatch;
-import magicjinn.artifactspolymer.polymer.PolymerClientChecks;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
@@ -23,7 +22,6 @@ public class SwimDataMixin {
     @Inject(method = "shouldDepleteSwimFlyingCharge", at = @At("HEAD"), cancellable = true)
     private void artifactsPolymer$noDrainInWorldWater(Player player, CallbackInfoReturnable<Boolean> cir) {
         if (player instanceof ServerPlayer serverPlayer
-                && PolymerClientChecks.lacksArtifactsClient(serverPlayer)
                 && CharmOfSinkingPolymerPatch.inWorldWater(serverPlayer)) {
             cir.setReturnValue(false);
         }

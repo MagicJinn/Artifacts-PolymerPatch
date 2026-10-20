@@ -36,12 +36,7 @@ public final class PacketBootFooting {
     }
 
     public void tick(ServerPlayer player, boolean conditionsMet, Set<BlockPos> target) {
-        if (!PolymerClientChecks.lacksArtifactsClient(player) || !conditionsMet) {
-            clear(player);
-            return;
-        }
-
-        if (target.isEmpty()) {
+        if (!conditionsMet || target.isEmpty()) {
             clear(player);
             return;
         }
@@ -61,9 +56,12 @@ public final class PacketBootFooting {
     }
 
     public void onDisconnect(ServerPlayer player) {
-        active.remove(player.getUUID());
+        // Restore real blocks while the connection may still accept packets, then drop
+        // state.
+        clear(player);
     }
 
+    /** Tear down fake footing (unequip, disconnect, respawn). */
     public void clear(ServerPlayer player) {
         Set<BlockPos> previous = active.remove(player.getUUID());
         if (previous == null)
@@ -91,10 +89,16 @@ public final class PacketBootFooting {
     }
 
     private void sendFakeFooting(ServerPlayer player, BlockPos pos) {
+        if (player.connection == null)
+            return;
+
         player.connection.send(new ClientboundBlockUpdatePacket(pos, fakeState.get(player, pos)));
     }
 
     private static void sendRealBlock(ServerPlayer player, BlockPos pos) {
+        if (player.connection == null)
+            return;
+
         BlockState state = ((ServerLevel) player.level()).getBlockState(pos);
         player.connection.send(new ClientboundBlockUpdatePacket(pos, state));
     }

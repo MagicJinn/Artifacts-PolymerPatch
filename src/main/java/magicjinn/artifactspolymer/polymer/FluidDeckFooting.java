@@ -15,7 +15,7 @@ import net.minecraft.world.level.material.FluidState;
 /**
  * POLYMER WORKAROUND: Finds fluid-surface deck positions under / beside the
  * player, including preemptive blocks so vanilla clients can step up from slabs
- * onto water/lava (Artifacts clients handle this natively).
+ * onto water/lava.
  */
 final class FluidDeckFooting {
     private static final int SCAN_RADIUS = 2;

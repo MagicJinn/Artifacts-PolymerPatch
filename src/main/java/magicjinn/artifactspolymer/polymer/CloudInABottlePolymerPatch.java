@@ -28,10 +28,7 @@ public final class CloudInABottlePolymerPatch {
     }
 
     public static void tick(ServerPlayer player) {
-        // Only for vanilla/polymer clients. Artifacts handles double jump on its own
-        // client.
-        if (!PolymerClientChecks.lacksArtifactsClient(player) ||
-                !ModDataComponents.DOUBLE_JUMP.on(player).findAny()) {
+        if (!ModDataComponents.DOUBLE_JUMP.on(player).findAny()) {
             clear(player);
             return;
         }

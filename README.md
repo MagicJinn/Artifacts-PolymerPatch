@@ -20,9 +20,15 @@ Inspired by the [PolymerPorts](https://github.com/PolymerPorts) patches.
 
 Clients install **nothing**: no Fabric API, no Artifacts, no Trinkets.
 
+## Vanilla clients only
+
+This patch is **server-side / Polymer only** for now. Players with the Artifacts client mod are **kicked on join**. Install Artifacts on the server only; clients use the Polymer resource pack.
+
+Mixing Artifacts client + Polymer stand-ins does not work reliably, so dual-path support was dropped in favor of a hard vanilla-client requirement.
+
 ## Workarounds
 
-Artifacts expects its client mod for a handful of things. This patch fakes them server-side, and patched items explain themselves in their tooltip:
+Artifacts expects its client mod for a handful of things. This patch fakes them server-side for vanilla clients, and patched items explain themselves in their tooltip:
 
 - **Aqua Dashers**: Shows waterlogged barriers while sprinting to avoid desync.
 - **Strider Shoes**: Shows magma underfoot on lava so walking stays in sync.
@@ -38,10 +44,8 @@ Artifacts expects its client mod for a handful of things. This patch fakes them 
 - **Mimic**: a proper chest that opens its lid when it hops.
 - **Equip sounds**: everyone hears them, including the wearer.
 
-
 ## Good to know
 
 - **Worn artifacts are invisible** on the player model; the item in your hand and inventory is fine.
 - **The Artifacts config screen and toggle key are client-only**, so vanilla players can't use them.
 - Abilities run server-side, so some client-side feedback may be missing or look a little different.
-

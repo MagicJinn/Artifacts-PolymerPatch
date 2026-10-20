@@ -12,7 +12,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import eu.pb4.polymer.core.api.utils.PolymerUtils;
-import magicjinn.artifactspolymer.polymer.PolymerClientChecks;
 
 @Mixin(EnderpearlItem.class)
 public abstract class EnderpearlItemWarpDriveMixin {
@@ -22,11 +21,9 @@ public abstract class EnderpearlItemWarpDriveMixin {
     @Inject(method = "use", at = @At("RETURN"))
     private void onUse(Level level, Player player, InteractionHand hand,
             CallbackInfoReturnable<InteractionResult> cir) {
-        // If the player is not a server player or has artifacts client, do nothing
-        if (!(player instanceof ServerPlayer serverPlayer) || !PolymerClientChecks.lacksArtifactsClient(serverPlayer))
+        if (!(player instanceof ServerPlayer serverPlayer))
             return;
 
-        // If nothing happened, do nothing
         InteractionResult result = cir.getReturnValue();
         if (result == null || !result.consumesAction())
             return;
