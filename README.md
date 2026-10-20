@@ -6,11 +6,7 @@
 
 ![Modrinth: Artifacts Polymer Patch](https://img.shields.io/badge/Modrinth-Artifacts_Polymer_Patch-00ae5d?logo=modrinth) ![CurseForge: Artifacts Polymer Patch](https://img.shields.io/badge/CurseForge-Artifacts_Polymer_Patch-f16437?logo=curseforge)
 
-A companion patch for [Artifacts](https://modrinth.com/mod/artifacts) that adds the [Polymer](https://modrinth.com/mod/polymer) glue so **vanilla clients** can join a server and use most of the mod. Artifacts still does the real work. This only fills in the places where it normally leans on its own client mod.
-
-Inspired by the [PolymerPorts](https://github.com/PolymerPorts) patches.
-
-**Minecraft 26.1.2** · **Artifacts 15.1.3** · **Polymer 0.16.5** · **Java 25**
+A companion patch for **Artifacts** that uses **Polymer** to make it run on the server so **vanilla clients** can join a server and use most of the mod.
 
 ## Server setup
 
@@ -22,9 +18,7 @@ Clients install **nothing**: no Fabric API, no Artifacts, no Trinkets.
 
 ## Vanilla clients only
 
-This patch is **server-side / Polymer only** for now. Players with the Artifacts client mod are **kicked on join**. Install Artifacts on the server only; clients use the Polymer resource pack.
-
-Mixing Artifacts client + Polymer stand-ins does not work reliably, so dual-path support was dropped in favor of a hard vanilla-client requirement.
+This patch is **server-side / Polymer only** for now. Players with the Artifacts client mod are **kicked on join**. Install Artifacts on the server only; clients use the Polymer resource pack. Mixing Artifacts client + Polymer stand-ins does not work reliably, so dual-path support was dropped in favor of a hard vanilla-client requirement.
 
 ## Workarounds
 
