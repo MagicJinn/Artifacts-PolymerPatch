@@ -56,6 +56,11 @@ public final class CloudInABottlePolymerPatch {
         clear(player);
     }
 
+    /** Same UUID as the dead player. Drop stale jump flags. */
+    public static void onRespawn(ServerPlayer oldPlayer) {
+        clear(oldPlayer);
+    }
+
     private static boolean isGroundedForDoubleJump(ServerPlayer player) {
         if (!(player.onGround() || player.onClimbable()))
             return false;

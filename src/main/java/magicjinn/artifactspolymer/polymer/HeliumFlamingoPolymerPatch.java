@@ -14,6 +14,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.network.protocol.game.ClientboundUpdateAttributesPacket;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -25,6 +26,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Input;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
 /**
@@ -53,6 +55,9 @@ public final class HeliumFlamingoPolymerPatch {
     /** Active swim up/down with jump/shift (~4.5 blocks/s). */
     private static final double VERTICAL_SWIM_PER_TICK = 4.5 / 20.0;
 
+    /** Drop lastPos if the player jumped farther than flamingo motion allows. */
+    private static final double TELEPORT_DIST_SQR = 4.0;
+
     private static final Identifier NO_GRAVITY_ID = ArtifactsPolymerPatch.id("helium_flamingo_no_gravity");
 
     /**
@@ -67,6 +72,7 @@ public final class HeliumFlamingoPolymerPatch {
         ServerBossEvent chargeBar;
         boolean wasSprint;
         Vec3 lastPos;
+        ResourceKey<Level> lastDimension;
         int lastBubblePop;
         boolean selfScaleActive;
         /** True only while Polymer is forcing air-swim pose / motion. */
@@ -78,16 +84,23 @@ public final class HeliumFlamingoPolymerPatch {
     }
 
     public static void tick(ServerPlayer player) {
+        // Polymer boss bar / air-swim only for vanilla clients. Artifacts clients
+        // already have the Helium HUD and flight handling.
+        if (!PolymerClientChecks.lacksArtifactsClient(player)) {
+            clearAll(player);
+            return;
+        }
+
         updateBossBar(player);
 
-        if (!PolymerClientChecks.lacksArtifactsClient(player) || !ModDataComponents.SWIM_IN_AIR.on(player).findAny()) {
-            clearPlayerState(player);
+        if (!ModDataComponents.SWIM_IN_AIR.on(player).findAny()) {
+            resetSprintAndFlight(player);
             return;
         }
 
         SwimData swimData = PlatformServices.getPlatformHelper().getSwimData(player);
         if (swimData == null) {
-            clearPlayerState(player);
+            resetSprintAndFlight(player);
             return;
         }
 
@@ -97,16 +110,32 @@ public final class HeliumFlamingoPolymerPatch {
     }
 
     public static void onDisconnect(ServerPlayer player) {
-        clearPlayerState(player);
-        removeChargeBossBar(player, true);
+        clearAll(player);
         STATES.remove(player.getUUID());
+    }
+
+    /** Same UUID as the dead player. Drop stale boss bar / flight state. */
+    public static void onRespawn(ServerPlayer oldPlayer) {
+        onDisconnect(oldPlayer);
+    }
+
+    private static void clearAll(ServerPlayer player) {
+        resetSprintAndFlight(player);
+        removeChargeBossBar(player);
+    }
+
+    private static void resetSprintAndFlight(ServerPlayer player) {
+        PlayerState state = STATES.get(player.getUUID());
+        if (state != null)
+            state.wasSprint = false;
+        clearFlight(player);
     }
 
     private static void updateBossBar(ServerPlayer player) {
         // Include cooldown: mid-air cancel puts the flamingo on cooldown for a few
         // seconds, but charge still recharges and the bar should stay visible.
         if (!ModDataComponents.SWIM_IN_AIR.on(player).includeItemsOnCooldown().findAny()) {
-            removeChargeBossBar(player, true);
+            removeChargeBossBar(player);
             return;
         }
 
@@ -134,11 +163,13 @@ public final class HeliumFlamingoPolymerPatch {
             ServerBossEvent created = new ServerBossEvent(
                     UUID.randomUUID(),
                     name,
-                            BossEvent.BossBarColor.PINK,
+                    BossEvent.BossBarColor.PINK,
                     BossEvent.BossBarOverlay.PROGRESS);
             created.setVisible(true);
             created.addPlayer(player);
             state.chargeBar = created;
+        } else {
+            state.chargeBar.setVisible(true);
         }
         state.chargeBar.setName(name);
         // Round to nearest 10% to avoid jitter on clients.
@@ -159,16 +190,11 @@ public final class HeliumFlamingoPolymerPatch {
     }
 
     private static void removeChargeBossBar(ServerPlayer player) {
-        removeChargeBossBar(player, false);
-    }
-
-    private static void removeChargeBossBar(ServerPlayer player, boolean removePlayer) {
         PlayerState state = STATES.get(player.getUUID());
         if (state == null || state.chargeBar == null)
             return;
 
-        if (removePlayer)
-            state.chargeBar.removePlayer(player);
+        state.chargeBar.removePlayer(player);
         state.chargeBar.setVisible(false);
         state.chargeBar = null;
     }
@@ -221,11 +247,18 @@ public final class HeliumFlamingoPolymerPatch {
         // Rewind to last flamingo pos and apply our motion so Polymer owns movement.
         PlayerState state = state(player);
         state.airSwimActive = true;
-        Vec3 origin = state.lastPos != null ? state.lastPos : player.position();
+        Vec3 current = player.position();
+        ResourceKey<Level> dimension = player.level().dimension();
+        if (state.lastPos != null
+                && (state.lastDimension != dimension || state.lastPos.distanceToSqr(current) > TELEPORT_DIST_SQR)) {
+            state.lastPos = null;
+        }
+        Vec3 origin = state.lastPos != null ? state.lastPos : current;
         player.setPos(origin.x, origin.y, origin.z);
         player.setDeltaMovement(motion);
         player.move(MoverType.SELF, motion);
         state.lastPos = player.position();
+        state.lastDimension = dimension;
         player.connection.send(new ClientboundSetEntityMotionPacket(player));
     }
 
@@ -337,14 +370,8 @@ public final class HeliumFlamingoPolymerPatch {
         if (state != null) {
             state.airSwimActive = false;
             state.lastPos = null;
+            state.lastDimension = null;
             state.lastBubblePop = 0;
         }
-    }
-
-    private static void clearPlayerState(ServerPlayer player) {
-        PlayerState state = STATES.get(player.getUUID());
-        if (state != null)
-            state.wasSprint = false;
-        clearFlight(player);
     }
 }

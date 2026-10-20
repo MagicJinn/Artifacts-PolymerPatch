@@ -10,7 +10,8 @@
 		"SwimInAirTooltipMixin",
 		"TooltipHelperMixin",
 		"EquipmentSlotManagerMixin",
-		"TrinketUtilitiesMixin"
+		"TrinketUtilitiesMixin",
+		"SwimDataMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

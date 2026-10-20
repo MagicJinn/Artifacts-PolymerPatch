@@ -33,7 +33,6 @@
 		"polymer-resource-pack": "*",
 		"polymer-virtual-entity": "*",
 		"factorytools": "*",
-		"trinkets": "*",
-		"artifacts-polymer-patch": "*"
+		"trinkets": "*"
 	}
 }

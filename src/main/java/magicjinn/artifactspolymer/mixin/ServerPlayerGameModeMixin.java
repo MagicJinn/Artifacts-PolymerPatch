@@ -3,6 +3,7 @@ package magicjinn.artifactspolymer.mixin;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -34,38 +35,46 @@ public abstract class ServerPlayerGameModeMixin {
     private BlockPos destroyPos;
 
     @Shadow
-    private int destroyProgressStart;
-
-    @Shadow
-    private int gameTicks;
-
-    @Shadow
     private int lastSentState;
+
+    @Unique
+    private float artifactsPolymer$destroyProgress;
+
+    @Unique
+    private BlockPos artifactsPolymer$destroyTrackingPos;
 
     @Inject(method = "tick", at = @At("TAIL"))
     private void onServerPlayerGameModeTick(CallbackInfo info) {
-        if (!isDestroyingBlock)
+        if (!isDestroyingBlock) {
+            artifactsPolymer$destroyProgress = 0.0F;
+            artifactsPolymer$destroyTrackingPos = null;
+            return;
+        }
+
+        if (!PolymerClientChecks.lacksArtifactsClient(player))
+            return;
+
+        if (!ModDataComponents.TOOL_TIER_UPGRADE.on(player).findAny())
             return;
 
         BlockState state = level.getBlockState(destroyPos);
-        int elapsed = gameTicks - destroyProgressStart;
-        if (!shouldFinishDestroy(player, state, destroyPos, elapsed))
+        if (state.isAir())
             return;
 
+        if (artifactsPolymer$destroyTrackingPos == null || !artifactsPolymer$destroyTrackingPos.equals(destroyPos)) {
+            artifactsPolymer$destroyTrackingPos = destroyPos.immutable();
+            artifactsPolymer$destroyProgress = 0.0F;
+        }
+
+        artifactsPolymer$destroyProgress += state.getDestroyProgress(player, level, destroyPos);
+        if (artifactsPolymer$destroyProgress < 1.0F)
+            return;
+
+        artifactsPolymer$destroyProgress = 0.0F;
+        artifactsPolymer$destroyTrackingPos = null;
         isDestroyingBlock = false;
         lastSentState = -1;
         finishDestroy((ServerPlayerGameMode) (Object) this, player, level, destroyPos);
-    }
-
-    private static boolean shouldFinishDestroy(ServerPlayer player, BlockState state, BlockPos pos, int elapsedTicks) {
-        if (!PolymerClientChecks.lacksArtifactsClient(player) || state.isAir())
-            return false;
-
-        if (!ModDataComponents.TOOL_TIER_UPGRADE.on(player).findAny())
-            return false;
-
-        float progress = state.getDestroyProgress(player, player.level(), pos) * (elapsedTicks + 1);
-        return progress >= 1.0F;
     }
 
     /** Finish the destroy block serverside */

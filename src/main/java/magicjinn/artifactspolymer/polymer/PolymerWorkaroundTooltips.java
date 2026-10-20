@@ -17,7 +17,9 @@ public final class PolymerWorkaroundTooltips {
                     "Ice blocks are replaced with non-slippery ice so you don't slip out of sync."),
             Map.entry("helium_flamingo",
                             "Best-effort at simulating swimming physics in the air.\nShrinks player hitbox while flying, and shows a charge bar while using or charging."),
-
+            Map.entry("flippers", "Spoofs swimming speed on the client and server."),
+                    Map.entry("charm_of_sinking",
+                    "Increases sinking, walking speed and step height in water to compensate. Always on (no toggle)."),
             Map.entry("digging_claws", "Triggers block breaking early on the server."),
             Map.entry("umbrella", "Held upright like a spear so the canopy looks right."));
 

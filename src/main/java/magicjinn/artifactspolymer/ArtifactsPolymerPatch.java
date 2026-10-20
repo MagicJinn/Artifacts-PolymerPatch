@@ -1,6 +1,7 @@
 package magicjinn.artifactspolymer;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
@@ -12,6 +13,7 @@ import artifacts.Artifacts;
 import eu.pb4.polymer.core.api.utils.PolymerUtils;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import magicjinn.artifactspolymer.polymer.AquaDashersPolymerPatch;
+import magicjinn.artifactspolymer.polymer.CharmOfSinkingPolymerPatch;
 import magicjinn.artifactspolymer.polymer.CloudInABottlePolymerPatch;
 import magicjinn.artifactspolymer.polymer.EverlastingFoodPolymerPatch;
 import magicjinn.artifactspolymer.polymer.HeliumFlamingoPolymerPatch;
@@ -19,6 +21,7 @@ import magicjinn.artifactspolymer.polymer.NonSlipIceBlocks;
 import magicjinn.artifactspolymer.polymer.SnowshoesPolymerPatch;
 import magicjinn.artifactspolymer.polymer.SteadfastSpikesPolymerPatch;
 import magicjinn.artifactspolymer.polymer.StriderShoesPolymerPatch;
+import magicjinn.artifactspolymer.polymer.SwimSpeedPolymerPatch;
 import magicjinn.artifactspolymer.resourcepack.ResourcePackSetup;
 
 public class ArtifactsPolymerPatch implements ModInitializer {
@@ -45,11 +48,18 @@ public class ArtifactsPolymerPatch implements ModInitializer {
 
 		ServerPlayConnectionEvents.DISCONNECT.register((listener, server) -> {
 			AquaDashersPolymerPatch.onDisconnect(listener.player);
+			CharmOfSinkingPolymerPatch.onDisconnect(listener.player);
 			StriderShoesPolymerPatch.onDisconnect(listener.player);
 			SnowshoesPolymerPatch.onDisconnect(listener.player);
 			SteadfastSpikesPolymerPatch.onDisconnect(listener.player);
 			CloudInABottlePolymerPatch.onDisconnect(listener.player);
 			HeliumFlamingoPolymerPatch.onDisconnect(listener.player);
+			SwimSpeedPolymerPatch.onDisconnect(listener.player);
+		});
+
+		ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) -> {
+			CloudInABottlePolymerPatch.onRespawn(oldPlayer);
+			HeliumFlamingoPolymerPatch.onRespawn(oldPlayer);
 		});
 
 	}
