@@ -6,7 +6,7 @@
 
 ![Modrinth: Artifacts Polymer Patch](https://img.shields.io/badge/Modrinth-Artifacts_Polymer_Patch-00ae5d?logo=modrinth) ![CurseForge: Artifacts Polymer Patch](https://img.shields.io/badge/CurseForge-Artifacts_Polymer_Patch-f16437?logo=curseforge)
 
-A companion patch for [Artifacts](https://modrinth.com/mod/artifacts) that adds the [Polymer](https://modrinth.com/mod/polymer) glue so **vanilla clients** can join a server and use most of the mod. Artifacts still does the real work; this only fills in the places where it normally leans on its own client mod.
+A companion patch for [Artifacts](https://modrinth.com/mod/artifacts) that adds the [Polymer](https://modrinth.com/mod/polymer) glue so **vanilla clients** can join a server and use most of the mod. Artifacts still does the real work. This only fills in the places where it normally leans on its own client mod.
 
 Inspired by the [PolymerPorts](https://github.com/PolymerPorts) patches.
 
