@@ -4,7 +4,7 @@
 
 ## Play Artifacts with vanilla clients
 
-![Modrinth: Artifacts Polymer Patch](https://img.shields.io/badge/Modrinth-Artifacts_Polymer_Patch-00ae5d?logo=modrinth) ![CurseForge: Artifacts Polymer Patch](https://img.shields.io/badge/CurseForge-Artifacts_Polymer_Patch-f16437?logo=curseforge)
+[![Modrinth: Artifacts Polymer Patch](https://img.shields.io/badge/Modrinth-Artifacts_Polymer_Patch-00ae5d?logo=modrinth)](https://modrinth.com/mod/polymer-patch-for-artifacts) [![CurseForge: Artifacts Polymer Patch](https://img.shields.io/badge/CurseForge-Artifacts_Polymer_Patch-f16437?logo=curseforge)](https://www.curseforge.com/minecraft/mc-mods/polymer-patch-for-artifacts)
 
 A companion patch for **Artifacts** that uses **Polymer** to make it run on the server so **vanilla clients** can join a server and use most of the mod.
 
