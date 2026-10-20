@@ -1,6 +1,6 @@
 # Artifacts Polymer Patch
 
-![icon.png](icon.png)
+![icon.png](https://raw.githubusercontent.com/MagicJinn/Artifacts-PolymerPatch/refs/heads/main/icon.png)
 
 ## Play Artifacts with vanilla clients
 
