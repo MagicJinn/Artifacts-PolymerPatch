@@ -14,10 +14,17 @@ public final class PolymerClientChecks {
 
     // Artifacts registers UpdateConfigValuePacket only when its client mod is present.
     public static boolean lacksArtifactsClient(ServerPlayer player) {
-        return !ServerPlayNetworking.canSend(player, UpdateConfigValuePacket.TYPE);
+        return !hasArtifactsClient(player);
     }
 
     public static boolean hasArtifactsClient(ServerPlayer player) {
-        return !lacksArtifactsClient(player);
+        if (player.connection == null)
+            return false;
+        try {
+            return ServerPlayNetworking.canSend(player, UpdateConfigValuePacket.TYPE);
+        } catch (NullPointerException e) {
+            // Play addon not attached yet.
+            return false;
+        }
     }
 }

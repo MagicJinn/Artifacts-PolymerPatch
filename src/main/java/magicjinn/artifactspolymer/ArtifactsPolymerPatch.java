@@ -55,13 +55,16 @@ public class ArtifactsPolymerPatch implements ModInitializer {
 
 		EverlastingFoodPolymerPatch.patch();
 
-		// Kick Artifacts clients. canSend is reliable after channel REGISTER. JOIN is a
-		// backup.
+		// Kick Artifacts clients. Pending-channel REGISTER runs inside
+		// ServerPlayNetworkAddon.<init> before the addon is stored, so canSend NPEs.
+		// Use the event channel list there. JOIN + deferred canSend is the backup.
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
 			server.execute(() -> kickIfArtifactsClient(handler.player));
 		});
 		ClientboundPlayChannelEvents.REGISTER.register((handler, sender, server, channels) -> {
-			kickIfArtifactsClient(handler.player);
+			if (channels.contains(UpdateConfigValuePacket.TYPE.id())) {
+				kickArtifactsClient(handler.player);
+			}
 		});
 
 		ServerPlayConnectionEvents.DISCONNECT.register((listener, server) -> {
@@ -79,9 +82,21 @@ public class ArtifactsPolymerPatch implements ModInitializer {
 
 	/** Artifacts registers UpdateConfigValuePacket only with its client mod. */
 	private static void kickIfArtifactsClient(ServerPlayer player) {
-		if (player.connection == null || !ServerPlayNetworking.canSend(player, UpdateConfigValuePacket.TYPE))
+		if (player.connection == null)
 			return;
+		try {
+			if (!ServerPlayNetworking.canSend(player, UpdateConfigValuePacket.TYPE))
+				return;
+		} catch (NullPointerException e) {
+			// Play addon not attached yet (same window as pending-channel REGISTER).
+			return;
+		}
+		kickArtifactsClient(player);
+	}
 
+	private static void kickArtifactsClient(ServerPlayer player) {
+		if (player.connection == null)
+			return;
 		LOGGER.info("Kicking {}: Artifacts client is not allowed on this Polymer server",
 				player.getGameProfile().name());
 		player.connection.disconnect(ARTIFACTS_CLIENT_KICK);
