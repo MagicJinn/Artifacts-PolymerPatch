@@ -1,4 +1,4 @@
-# Artifacts Polymer Patch
+# Polymer Patch for Artifacts
 
 ![icon.png](https://raw.githubusercontent.com/MagicJinn/Artifacts-PolymerPatch/refs/heads/main/icon.png)
 
