@@ -6,7 +6,7 @@
 
 [![Modrinth: Artifacts Polymer Patch](https://img.shields.io/badge/Modrinth-Artifacts_Polymer_Patch-00ae5d?logo=modrinth)](https://modrinth.com/mod/polymer-patch-for-artifacts) [![CurseForge: Artifacts Polymer Patch](https://img.shields.io/badge/CurseForge-Artifacts_Polymer_Patch-f16437?logo=curseforge)](https://www.curseforge.com/minecraft/mc-mods/polymer-patch-for-artifacts)
 
-A companion patch for **Artifacts** that uses **Polymer** to make it run on the server so **vanilla clients** can join a server and use most of the mod.
+A patch for **Artifacts** that uses **Polymer** to make it run on the server so **vanilla clients** can join a server and use most of the mod.
 
 ## Server setup
 
@@ -14,11 +14,11 @@ A companion patch for **Artifacts** that uses **Polymer** to make it run on the 
 2. Enable Auto-Host in Polymer settings (`config/polymer/auto-host.json`).
 3. Have clients accept the Polymer resource pack.
 
-Clients install **nothing**: no Fabric API, no Artifacts, no Trinkets.
+Clients install **nothing**. no Fabric API, no Artifacts, no Trinkets.
 
 ## Vanilla clients only
 
-This patch is **server-side / Polymer only** for now. Players with the Artifacts client mod are **kicked on join**. Install Artifacts on the server only; clients use the Polymer resource pack. Mixing Artifacts client + Polymer stand-ins does not work reliably, so dual-path support was dropped in favor of a hard vanilla-client requirement.
+This patch is **server-side / Polymer only** for now. Players with the Artifacts client mod are **kicked on join**. This is done because mixing Artifacts client + Polymer stand-ins does not work reliably, so dual-path support was dropped in favor of a hard vanilla-client requirement.
 
 ## Workarounds
 
@@ -38,8 +38,8 @@ Artifacts expects its client mod for a handful of things. This patch fakes them 
 - **Mimic**: a proper chest that opens its lid when it hops.
 - **Equip sounds**: everyone hears them, including the wearer.
 
-## Good to know
+## Limitations
 
-- **Worn artifacts are invisible** on the player model. The item in your hand and inventory is fine.
-- **The Artifacts config screen and toggle key are client-only**, so vanilla players can't use them.
-- Abilities run server-side, so some client-side feedback may be missing or look a little different.
+- **Worn artifacts are not visible** on the player model. However, the item still appears correctly in your hand and inventory.
+- **Artifacts config screen and toggle key are unavailable** to vanilla clients. Items that normally require toggling are always active.
+- **Abilities are processed server-side**, so some client-side feedback might be missing or appear slightly different.
